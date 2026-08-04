@@ -40,7 +40,7 @@ const renderEventAgenda = (events) => {
     date.setDate(start.getDate() + offset);
     eventsForDate(events, date).forEach((event) => occurrences.push({ event, date: new Date(date) }));
   }
-  const items = occurrences.map(({ event, date }) => `<a class="event-agenda-item event-category-${eventCategory(event)}" href="${eventUrl(event)}"><time datetime="${date.toISOString().slice(0, 10)}"><strong>${date.toLocaleDateString('en-US', { day: '2-digit' })}</strong><span>${date.toLocaleDateString('en-US', { month: 'short' })}</span></time><span class="event-agenda-copy"><strong>${escapeText(event.title)}</strong><small>${escapeText(event.time || event.dateLabel)}</small></span><span class="event-agenda-arrow" aria-hidden="true">→</span></a>`).join('');
+  const items = occurrences.slice(0, 7).map(({ event, date }) => `<a class="event-agenda-item event-category-${eventCategory(event)}" href="${eventUrl(event)}"><time datetime="${date.toISOString().slice(0, 10)}"><strong>${date.toLocaleDateString('en-US', { day: '2-digit' })}</strong><span>${date.toLocaleDateString('en-US', { month: 'short' })}</span></time><span class="event-agenda-copy"><strong>${escapeText(event.title)}</strong><small>${escapeText(event.time || event.dateLabel)}</small></span><span class="event-agenda-arrow" aria-hidden="true">→</span></a>`).join('');
   agenda.innerHTML = `<div class="event-agenda-track">${items}</div><div class="event-agenda-track" aria-hidden="true">${items}</div>`;
   const toggle = document.querySelector('[data-agenda-toggle]');
   let manuallyPaused = false;
