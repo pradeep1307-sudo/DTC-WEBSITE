@@ -3,6 +3,7 @@ param(
 )
 
 $root = $PSScriptRoot
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, $Port)
 $listener.Start()
 Write-Host "Denver Tamil Church is running at http://localhost:$Port"
@@ -66,20 +67,36 @@ try {
       }
       if ($requestPath -eq 'api/youtube-videos') {
         try {
-          $feedUrl = 'https://www.youtube.com/feeds/videos.xml?channel_id=UCNPyD_nYVLhC5-47771aGdw'
-          [xml]$feed = (Invoke-WebRequest -Uri $feedUrl -UseBasicParsing -TimeoutSec 12).Content
-          $cutoff = [DateTimeOffset]::UtcNow.AddDays(-60)
-          $videoItems = @($feed.SelectNodes("/*[local-name()='feed']/*[local-name()='entry']") | ForEach-Object {
-            $publishedNode = $_.SelectSingleNode("*[local-name()='published']")
-            $videoIdNode = $_.SelectSingleNode("*[local-name()='videoId']")
-            $titleNode = $_.SelectSingleNode("*[local-name()='title']")
-            $published = [DateTimeOffset]::Parse($publishedNode.InnerText)
-            if ($published -ge $cutoff -and $titleNode.InnerText -match '(?i)sunday service') {
-              $videoId = $videoIdNode.InnerText
-              $escapedTitle = $titleNode.InnerText.Replace('\', '\\').Replace('"', '\"').Replace("`r", '\r').Replace("`n", '\n').Replace("`t", '\t')
-              '{"id":"' + $videoId + '","title":"' + $escapedTitle + '","published":"' + $published.ToString('o') + '","url":"https://www.youtube.com/watch?v=' + $videoId + '","thumbnail":"https://img.youtube.com/vi/' + $videoId + '/hqdefault.jpg"}'
-            }
+          $streamsUrl = 'https://www.youtube.com/@TamilChurchDenver/streams'
+          $youtubeHeaders = @{
+            'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36'
+            'Accept-Language' = 'en-US,en;q=0.9'
+          }
+          $pageContent = (Invoke-WebRequest -Uri $streamsUrl -UseBasicParsing -Headers $youtubeHeaders -TimeoutSec 30).Content
+          $lockupPositions = @([regex]::Matches($pageContent, '"lockupViewModel":') | ForEach-Object { $_.Index })
+          $cutoff = [DateTime]::UtcNow.AddDays(-60).Date
+          $parsedVideos = @()
+          for ($index = 0; $index -lt $lockupPositions.Count; $index += 1) {
+            $start = $lockupPositions[$index]
+            $end = if ($index + 1 -lt $lockupPositions.Count) { $lockupPositions[$index + 1] } else { [Math]::Min($pageContent.Length, $start + 30000) }
+            $lockup = $pageContent.Substring($start, $end - $start)
+            $idMatch = [regex]::Match($lockup, '"contentId":"([a-zA-Z0-9_-]{11})"')
+            if (-not $idMatch.Success) { continue }
+            $title = @([regex]::Matches($lockup, '"content":"([^"\\]*(?:\\.[^"\\]*)*)"') | ForEach-Object { $_.Groups[1].Value }) |
+              Where-Object { $_ -match '(?i)Sunday Service' } | Select-Object -First 1
+            if ([string]::IsNullOrWhiteSpace($title)) { continue }
+            $dateMatch = [regex]::Match($title, '(?i)(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(\d{1,2})\s+(\d{4})')
+            if (-not $dateMatch.Success) { continue }
+            $published = [DateTime]::Parse($dateMatch.Value, [Globalization.CultureInfo]::InvariantCulture)
+            if ($published.Date -lt $cutoff) { continue }
+            $parsedVideos += [pscustomobject]@{ Id = $idMatch.Groups[1].Value; Title = $title; Published = $published }
+          }
+          $videoItems = @($parsedVideos | Sort-Object Published -Descending | Group-Object Id | ForEach-Object {
+            $video = $_.Group[0]
+            $escapedTitle = $video.Title.Replace('\', '\\').Replace('"', '\"').Replace("`r", '\r').Replace("`n", '\n').Replace("`t", '\t')
+            '{"id":"' + $video.Id + '","title":"' + $escapedTitle + '","published":"' + $video.Published.ToString('o') + '","url":"https://www.youtube.com/watch?v=' + $video.Id + '","thumbnail":"https://i.ytimg.com/vi/' + $video.Id + '/hqdefault.jpg"}'
           })
+          if (-not $videoItems.Count) { throw 'No Sunday services were found on the Streams page.' }
           $json = '[' + [string]::Join(',', $videoItems) + ']'
           $bytes = [Text.Encoding]::UTF8.GetBytes($json)
           $header = "HTTP/1.1 200 OK`r`nContent-Type: application/json; charset=utf-8`r`nContent-Length: $($bytes.Length)`r`nCache-Control: no-cache`r`nConnection: close`r`n`r`n"

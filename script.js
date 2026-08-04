@@ -22,6 +22,8 @@ const pageTranslations = {
     titles: {
       'index.html': 'Denver Tamil Church',
       'ministry.html': 'Ministry | Denver Tamil Church',
+      'events.html': 'Upcoming Events | Denver Tamil Church',
+      'event-details.html': 'Event Details | Denver Tamil Church',
       'missions.html': 'Missions & Ministries | Denver Tamil Church',
       'gallery.html': 'Gallery | Denver Tamil Church',
       'give.html': 'Give | Denver Tamil Church',
@@ -30,6 +32,8 @@ const pageTranslations = {
     descriptions: {
       'index.html': 'Denver Tamil Church is a welcoming Tamil church in Denver for worship, prayer, and community.',
       'ministry.html': 'Explore Kids, Teen and Young Adult, Men’s, and Women’s ministry at Denver Tamil Church.',
+      'events.html': 'View upcoming worship services, outreach, fellowship, and family events at Denver Tamil Church.',
+      'event-details.html': 'Find dates, locations, and details for Denver Tamil Church events.',
       'missions.html': 'See how Denver Tamil Church serves families, faith, and community with practical ministries.',
       'gallery.html': 'View photos from worship services, ministries, and events at Denver Tamil Church.',
       'give.html': 'Support the church through generous giving and prayer partnership.',
@@ -353,16 +357,19 @@ const siteNavigation = [
   { page: 'live.html', href: 'live.html', en: 'Live Stream', ta: 'நேரலை' },
   { page: 'give.html', href: 'give.html', en: 'Give', ta: 'கொடுங்கள்' },
   { page: 'contact.html', href: 'contact.html', en: 'Contact', ta: 'தொடர்பு' },
-  { page: 'gallery.html', href: 'gallery.html', en: 'Gallery', ta: 'புகைப்படங்கள்' }
+  { page: 'events.html', href: 'events.html', en: 'Upcoming Events', ta: 'வரவிருக்கும் நிகழ்வுகள்', children: [
+    { page: 'events.html', href: 'events.html', en: 'Upcoming Events', ta: 'வரவிருக்கும் நிகழ்வுகள்' },
+    { page: 'gallery.html', href: 'gallery.html', en: 'Gallery', ta: 'புகைப்படங்கள்' }
+  ] }
 ];
 
 const normalizeNavigation = () => {
   const currentPage = getPageKey();
   document.querySelectorAll('.nav-links').forEach((nav, index) => {
-    nav.innerHTML = siteNavigation.map((item) => {
-      const isActive = item.page === currentPage || item.children?.some((child) => child.page === currentPage);
+    nav.innerHTML = siteNavigation.map((item, itemIndex) => {
+      const isActive = item.page === currentPage || item.children?.some((child) => child.page === currentPage) || (item.page === 'events.html' && currentPage === 'event-details.html');
       if (item.children) {
-        const menuId = `ministry-menu-${index}`;
+        const menuId = `navigation-menu-${index}-${itemIndex}`;
         const submenu = item.children.map((child) => {
           const childActive = child.page === currentPage;
           return `<a class="nav-submenu-link${childActive ? ' nav-link--active' : ''}" href="${child.href}"${childActive ? ' aria-current="page"' : ''}><span class="lang" data-lang="en">${child.en}</span><span class="lang" data-lang="ta">${child.ta}</span></a>`;
@@ -372,25 +379,32 @@ const normalizeNavigation = () => {
       return `<a class="nav-link${isActive ? ' nav-link--active' : ''}" href="${item.href}"${isActive ? ' aria-current="page"' : ''}><span class="lang" data-lang="en">${item.en}</span><span class="lang" data-lang="ta">${item.ta}</span></a>`;
     }).join('');
 
-    const dropdown = nav.querySelector('.nav-dropdown');
-    const toggle = nav.querySelector('.nav-dropdown-toggle');
-    toggle?.addEventListener('click', (event) => {
-      event.stopPropagation();
-      const isOpen = dropdown.classList.toggle('is-open');
-      toggle.setAttribute('aria-expanded', String(isOpen));
-    });
-    dropdown?.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        dropdown.classList.remove('is-open');
-        toggle.setAttribute('aria-expanded', 'false');
-        toggle.focus();
-      }
-    });
-    document.addEventListener('click', (event) => {
-      if (!dropdown?.contains(event.target)) {
-        dropdown?.classList.remove('is-open');
-        toggle?.setAttribute('aria-expanded', 'false');
-      }
+    nav.querySelectorAll('.nav-dropdown').forEach((dropdown) => {
+      const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+      toggle?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        nav.querySelectorAll('.nav-dropdown.is-open').forEach((openDropdown) => {
+          if (openDropdown !== dropdown) {
+            openDropdown.classList.remove('is-open');
+            openDropdown.querySelector('.nav-dropdown-toggle')?.setAttribute('aria-expanded', 'false');
+          }
+        });
+        const isOpen = dropdown.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', String(isOpen));
+      });
+      dropdown.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          dropdown.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+          toggle.focus();
+        }
+      });
+      document.addEventListener('click', (event) => {
+        if (!dropdown.contains(event.target)) {
+          dropdown.classList.remove('is-open');
+          toggle?.setAttribute('aria-expanded', 'false');
+        }
+      });
     });
   });
   setLanguage(localStorage.getItem('siteLanguage') || 'en');
@@ -434,6 +448,7 @@ const initSharedHeaderIdentity = () => {
 
   headers.forEach((header) => {
     const brand = header.querySelector('.brand');
+    const languageControl = header.querySelector('.lang-card, .lang-switch');
     brand?.querySelector('.brand-name')?.remove();
     if (brand && !header.querySelector('.header-service-countdown')) {
       let brandCluster = brand.closest('.brand-wrapper, .header-brand-cluster');
@@ -449,7 +464,7 @@ const initSharedHeaderIdentity = () => {
       const widget = document.createElement('div');
       const panelId = `service-countdown-${Math.random().toString(36).slice(2, 8)}`;
       widget.className = 'header-service-countdown';
-      widget.innerHTML = `<button class="header-service-time" type="button" aria-expanded="false" aria-controls="${panelId}"><span class="service-time-line"><span class="lang" data-lang="en"><strong>Sunday Service</strong><i aria-hidden="true">|</i><small>4:30 PM</small></span><span class="lang" data-lang="ta"><strong>ஞாயிறு ஆராதனை</strong><i aria-hidden="true">|</i><small>மாலை 4:30</small></span><span class="service-countdown-chevron" aria-hidden="true"></span></span><span class="service-countdown-compact" aria-label="Time remaining until Sunday service"><b data-countdown-compact="days">00</b>D <i>:</i> <b data-countdown-compact="hours">00</b>H <i>:</i> <b data-countdown-compact="minutes">00</b>M <i>:</i> <b data-countdown-compact="seconds">00</b>S</span></button><div class="service-countdown-panel" id="${panelId}"><p>COUNTDOWN TO SUNDAY</p><strong class="service-countdown-next-date"></strong><div class="service-countdown-values"><span><strong data-countdown="days">00</strong><small>Day(s)</small></span><span><strong data-countdown="hours">00</strong><small>Hour(s)</small></span><span><strong data-countdown="minutes">00</strong><small>Minute(s)</small></span><span><strong data-countdown="seconds">00</strong><small>Second(s)</small></span></div><div class="service-countdown-details"><span><strong>Worship Service</strong> · Sundays at 4:30 PM</span><span>9052 W Ken Caryl Ave · Littleton, CO</span></div><div class="service-countdown-actions"><a href="live.html">Watch Live →</a><a href="contact.html">Plan Your Visit →</a></div></div>`;
+      widget.innerHTML = `<button class="header-service-time" type="button" aria-expanded="false" aria-controls="${panelId}"><span class="service-time-line"><span class="lang" data-lang="en"><strong>Sunday Service</strong><i aria-hidden="true">|</i><small>4:30 PM</small></span><span class="lang" data-lang="ta"><strong>ஞாயிறு ஆராதனை</strong><i aria-hidden="true">|</i><small>மாலை 4:30</small></span><span class="service-countdown-chevron" aria-hidden="true"></span></span><span class="service-countdown-compact" aria-label="Time remaining until Sunday service"><b data-countdown-compact="days">00</b>D <i>:</i> <b data-countdown-compact="hours">00</b>H <i>:</i> <b data-countdown-compact="minutes">00</b>M <i>:</i> <b data-countdown-compact="seconds">00</b>S</span></button><span class="service-address-line"><strong>9052 W Ken Caryl Ave</strong><span>Littleton, CO 80128</span></span><div class="service-countdown-panel" id="${panelId}"><p>COUNTDOWN TO SUNDAY</p><strong class="service-countdown-next-date"></strong><div class="service-countdown-values"><span><strong data-countdown="days">00</strong><small>Day(s)</small></span><span><strong data-countdown="hours">00</strong><small>Hour(s)</small></span><span><strong data-countdown="minutes">00</strong><small>Minute(s)</small></span><span><strong data-countdown="seconds">00</strong><small>Second(s)</small></span></div><div class="service-countdown-details"><span><strong>Worship Service</strong> · Sundays at 4:30 PM</span><span>9052 W Ken Caryl Ave · Littleton, CO</span></div><div class="service-countdown-actions"><a href="live.html">Watch Live →</a><a href="contact.html">Plan Your Visit →</a></div></div>`;
       brandCluster.append(widget);
 
       const toggle = widget.querySelector('.header-service-time');
@@ -471,20 +486,21 @@ const initSharedHeaderIdentity = () => {
         }
       });
     }
-    if (header.querySelector('.header-social-links')) return;
-
-    const socialGroup = document.createElement('div');
-    socialGroup.className = 'header-social-links';
-    socialLinks.forEach((link) => {
-      const anchor = document.createElement('a');
-      anchor.href = link.href;
-      anchor.target = '_blank';
-      anchor.rel = 'noopener noreferrer';
-      anchor.setAttribute('aria-label', link.label);
-      anchor.innerHTML = link.icon;
-      socialGroup.append(anchor);
-    });
-    header.append(socialGroup);
+    if (!header.querySelector('.header-social-links')) {
+      const socialGroup = document.createElement('div');
+      socialGroup.className = 'header-social-links';
+      socialLinks.forEach((link) => {
+        const anchor = document.createElement('a');
+        anchor.href = link.href;
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+        anchor.setAttribute('aria-label', link.label);
+        anchor.innerHTML = link.icon;
+        socialGroup.append(anchor);
+      });
+      header.append(socialGroup);
+    }
+    if (languageControl) header.append(languageControl);
   });
 
   const zonedParts = (date) => Object.fromEntries(new Intl.DateTimeFormat('en-US', {
@@ -560,7 +576,12 @@ const arrangeHomeEventsAndInfo = () => {
   const featured = document.querySelector('.home-featured');
   const events = document.querySelector('.events');
   const quickInfo = document.querySelector('.quick-info');
-  if (!featured || !events || !quickInfo || document.querySelector('.home-featured-events-layout')) return;
+  if (!featured || !quickInfo || document.querySelector('.home-featured-events-layout')) return;
+  if (!events) {
+    quickInfo.classList.add('home-quick-info-bottom');
+    document.querySelector('main')?.append(quickInfo);
+    return;
+  }
 
   const featureRow = document.createElement('div');
   featureRow.className = 'home-featured-events-layout';
@@ -696,7 +717,10 @@ const initPreviousServices = async () => {
         </a>
       </article>`).join('');
   } catch (error) {
-    track.innerHTML = '<p class="previous-services-empty"><span class="lang" data-lang="en">Recent services could not be loaded. Please view them on our YouTube channel.</span><span class="lang" data-lang="ta">சமீபத்திய ஆராதனைகளை ஏற்ற முடியவில்லை. எங்கள் YouTube சேனலில் பார்க்கவும்.</span></p>';
+    track.innerHTML = `<article class="previous-service-card previous-service-card--fallback">
+      <iframe src="https://www.youtube.com/embed/videoseries?list=UUNPyD_nYVLhC5-47771aGdw" title="Recent Denver Tamil Church services" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <div class="previous-service-fallback-content"><strong>Recent Services</strong><span>The live YouTube playlist is shown while the local two-month feed reconnects.</span><a href="https://www.youtube.com/@TamilChurchDenver/streams" target="_blank" rel="noopener noreferrer">View all streams →</a></div>
+    </article>`;
     setLanguage(localStorage.getItem('siteLanguage') || 'en');
   }
   updateArrows();
@@ -858,7 +882,7 @@ const initChurchChat = () => {
           <div class="church-chat-header"><span class="church-chat-avatar" aria-hidden="true"><img src="assets/lOGO.png" alt="" width="142" height="94" /></span><div><strong>Denver Tamil Church Assistant</strong><span><i aria-hidden="true"></i> Ready to help</span></div></div>
           <div class="church-chat-messages" role="log" aria-live="polite" aria-relevant="additions"><div class="church-chat-message is-bot">Welcome! Ask me a question about Denver Tamil Church or anything published on this website.</div></div>
           <form class="church-chat-form"><label class="sr-only" for="church-chat-input">Ask the church website assistant</label><input id="church-chat-input" type="text" placeholder="Type your question…" autocomplete="off" maxlength="240" required /><button type="submit" aria-label="Send question">Send</button></form>
-          <p class="church-chat-disclaimer">Answers come from this website. For personal or urgent requests, please contact the church directly.</p>
+          <p class="church-chat-disclaimer">Runs locally using this website’s content—no AI API or tokens. For personal or urgent requests, please contact the church directly.</p>
         </div>
       </section>`;
     document.body.append(shell);
@@ -899,13 +923,18 @@ const initChurchChat = () => {
     if (event.key === 'Escape' && chat.classList.contains('is-open')) setChatOpen(false);
   });
   const knowledge = [
-    { words: ['time', 'service', 'sunday', 'worship', 'when', 'நேரம்', 'ஆராதனை'], answer: 'Sunday worship begins at 4:30 PM Mountain Time. The Tamil service includes Kids Sunday School, and an English service is held every third Sunday.', link: ['View church information', 'index.html'] },
+    { words: ['time', 'service', 'sunday', 'worship', 'communion', 'fasting', 'promise service', 'women bible', 'zoom'], answer: 'Sunday worship begins at 4:30 PM Mountain Time, and Prayer & Bible Study meets every Friday at 6:30 PM. Monthly gatherings include Communion on the first Sunday, Teen and Adult Service on the third Sunday, Fasting and Prayer on the first Saturday, Women’s Bible Study via Zoom on the first and third Thursdays, and God’s Promise Service at 6:00 AM on the first day.', link: ['View all service dates', 'events.html#event-calendar'] },
+    { words: ['christmas', 'easter', 'holy week', 'palm sunday', 'maundy', 'good friday', 'holy saturday', 'ascension', 'pentecost', 'advent'], answer: 'The church calendar includes Palm Sunday, Holy Week, Easter, Ascension Day, Pentecost, Advent, Christmas Eve, and Christmas Day. Select an observance in the calendar for its date and complete details.', link: ['View Christian observances', 'events.html#event-calendar'] },
+    { words: ['holiday', 'new year', 'martin luther king', 'presidents day', 'memorial day', 'juneteenth', 'independence day', 'labor day', 'columbus day', 'veterans day', 'thanksgiving'], answer: 'The calendar identifies major U.S. holidays separately from church events and Christian observances. Use the color legend to distinguish each category.', link: ['View the church calendar', 'events.html#event-calendar'] },
+    { words: ['friday', 'prayer and bible', 'prayer bible', '6:30'], answer: 'Prayer & Bible Study meets every Friday at 6:30 PM at 9052 W Ken Caryl Ave, Littleton, CO 80128.', link: ['View the event calendar', 'events.html#event-calendar'] },
+    { words: ['ministry', 'ministries', 'kids ministry', 'children ministry', 'teen ministry', 'youth ministry', 'young adult', 'mens ministry', "men's ministry", 'womens ministry', "women's ministry"], answer: 'Denver Tamil Church offers Kids, Teen & Young Adult, Men’s, and Women’s ministries where every generation can grow in Christ, connect, pray, study Scripture, and serve.', link: ['Explore ministries', 'ministry.html'] },
+    { words: ['time', 'service', 'sunday', 'worship', 'when', 'communion', 'fasting', 'promise', 'women', 'bible', 'zoom', 'நேரம்', 'ஆராதனை'], answer: 'Sunday worship begins at 4:30 PM Mountain Time. Monthly gatherings include Communion on the first Sunday, Teen and Adult Service on the third Sunday, Fasting and Prayer on the first Saturday, Women’s Bible Study via Zoom on the first and third Thursdays, and God’s Promise Service at 6:00 AM on the first day.', link: ['View the event calendar', 'events.html'] },
     { words: ['address', 'location', 'where', 'visit', 'direction', 'parking', 'முகவரி', 'இடம்'], answer: 'Denver Tamil Church meets at 9052 W Ken Caryl Ave, Littleton, CO 80128.', link: ['Get directions', 'https://www.google.com/maps/search/?api=1&query=9052+W+Ken+Caryl+Ave%2C+Littleton%2C+CO+80128'] },
     { words: ['believe', 'belief', 'faith', 'doctrine', 'god', 'jesus', 'gospel', 'நம்பிக்கை', 'இயேசு'], answer: 'We believe in one God and Father, revealed through Jesus Christ in redemption and through the Holy Spirit working in grace. Our teaching is rooted in Scripture, prayer, heartfelt worship, holy living, and faithful discipleship.', link: ['Read about our faith', 'index.html#home-beliefs'] },
     { words: ['pastor', 'jude', 'leader', 'போதகர்'], answer: 'Pastor Jude Francis is a pastor, teacher, and marketplace minister who equips believers to live as authentic disciples of Christ. He is married to Merina Francis, and they have two daughters.', link: ['Meet our pastor', 'index.html'] },
     { words: ['mission', 'outreach', 'homeless', 'discipleship', 'ministry', 'serve', 'ஊழியம்'], answer: 'Our ministries include local Denver outreach, global missions support in India, and discipleship ministries for adults, women, youth, and young adults.', link: ['Explore missions', 'missions.html'] },
     { words: ['live', 'stream', 'youtube', 'online', 'video', 'watch', 'நேரலை'], answer: 'You can watch Sunday worship and browse recent services on the Live Stream page.', link: ['Open Live Stream', 'live.html'] },
-    { words: ['event', 'upcoming', 'calendar', 'vbs', 'picnic', 'நிகழ்வு'], answer: 'Upcoming church announcements and event posters are shown on the Who We Are homepage. Select a poster to view it at full size.', link: ['See upcoming events', 'index.html'] },
+    { words: ['event', 'upcoming', 'calendar', 'vbs', 'picnic', 'நிகழ்வு'], answer: 'The Upcoming Events page includes a month calendar, event posters, dates, locations, and complete event details.', link: ['See upcoming events', 'events.html'] },
     { words: ['give', 'giving', 'donate', 'offering', 'tithe', 'கொடை'], answer: 'The Give page explains the available ways to support Denver Tamil Church and its ministries.', link: ['View giving options', 'give.html'] },
     { words: ['gallery', 'photo', 'album', 'picture', 'புகைப்படம்'], answer: 'The Gallery contains church event albums. Select an album to browse all of its available photos.', link: ['Open Gallery', 'gallery.html'] },
     { words: ['prayer', 'request', 'pray', 'ஜெபம்'], answer: 'We would be honored to pray with you. Choose “Prayer Request” in the contact form above, or email the church directly.', link: ['Email a prayer request', 'mailto:info@denvertamilchurch.com'] },
@@ -914,6 +943,8 @@ const initChurchChat = () => {
   ];
   const websitePages = [
     ['Who We Are', 'index.html'],
+    ['Upcoming Events', 'events.html'],
+    ['Ministries', 'ministry.html'],
     ['Missions', 'missions.html'],
     ['Live Stream', 'live.html'],
     ['Give', 'give.html'],
@@ -929,7 +960,7 @@ const initChurchChat = () => {
       if (!response.ok) return [];
       const documentCopy = new DOMParser().parseFromString(await response.text(), 'text/html');
       documentCopy.querySelectorAll('script, style, nav, footer, [data-lang="ta"]').forEach((node) => node.remove());
-      return [...documentCopy.querySelectorAll('main h1, main h2, main h3, main p, main li, main figcaption')]
+      return [...documentCopy.querySelectorAll('main h1, main h2, main h3, main p, main li, main figcaption, main dt, main dd, main label, main option, main time')]
         .map((node) => node.textContent.replace(/\s+/g, ' ').trim())
         .filter((text) => text.length >= 18)
         .map((text) => ({ title, href, text, tokens: tokenize(text) }));
@@ -937,6 +968,19 @@ const initChurchChat = () => {
       return [];
     }
   })).then((groups) => groups.flat());
+  const eventIndexPromise = fetch('assets/upcoming/events.json', { cache: 'no-store' })
+    .then((response) => response.ok ? response.json() : [])
+    .then((events) => events.map((event) => {
+      const text = [event.title, event.dateLabel, event.time, event.location, event.summary, ...(event.details || [])]
+        .filter(Boolean).join('. ');
+      return {
+        title: 'Upcoming Events',
+        href: `event-details.html?id=${encodeURIComponent(event.id)}`,
+        text,
+        tokens: tokenize(text)
+      };
+    }))
+    .catch(() => []);
 
   const addMessage = (text, type, link) => {
     const message = document.createElement('div');
@@ -1063,7 +1107,7 @@ const initChurchChat = () => {
       return;
     }
     const queryTokens = tokenize(question);
-    const websiteIndex = await websiteIndexPromise;
+    const websiteIndex = [...await websiteIndexPromise, ...await eventIndexPromise];
     const pageMatches = websiteIndex
       .map((entry) => ({ entry, score: queryTokens.reduce((score, token) => score + (entry.tokens.includes(token) ? 2 : entry.text.toLocaleLowerCase().includes(token) ? 1 : 0), 0) }))
       .filter((result) => result.score > 0)
@@ -1120,6 +1164,56 @@ const initHomeLiveLauncher = () => {
   document.body.append(link);
 };
 
+const initMinistryDialogs = () => {
+  const cards = [...document.querySelectorAll('.ministry-card')];
+  const dialogs = [...document.querySelectorAll('.ministry-dialog')];
+  if (!cards.length || cards.length !== dialogs.length) return;
+  const closeDialog = (dialog) => {
+    if (!dialog.open || dialog.classList.contains('is-closing')) return;
+    dialog.classList.add('is-closing');
+    window.setTimeout(() => {
+      dialog.close();
+      dialog.classList.remove('is-closing');
+      document.body.classList.remove('ministry-dialog-is-open');
+    }, 240);
+  };
+  cards.forEach((card, index) => {
+    const dialog = dialogs[index];
+    const title = card.querySelector('h2')?.textContent.trim() || 'Ministry';
+    const openDialog = () => {
+      dialog.classList.remove('is-closing');
+      dialog.showModal();
+      document.body.classList.add('ministry-dialog-is-open');
+    };
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-haspopup', 'dialog');
+    card.setAttribute('aria-controls', dialog.id);
+    card.setAttribute('aria-label', `View ${title} details`);
+    card.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      openDialog();
+    }, { capture: true });
+    card.addEventListener('keydown', (event) => {
+      if (!['Enter', ' '].includes(event.key)) return;
+      event.preventDefault();
+      openDialog();
+    });
+    dialog.querySelector('[data-ministry-dialog-close]')?.addEventListener('click', () => closeDialog(dialog));
+    dialog.addEventListener('click', (event) => {
+      const bounds = dialog.getBoundingClientRect();
+      const outside = event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom;
+      if (outside) closeDialog(dialog);
+    });
+    dialog.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      closeDialog(dialog);
+    });
+    dialog.addEventListener('close', () => document.body.classList.remove('ministry-dialog-is-open'));
+  });
+};
+
 window.addEventListener('DOMContentLoaded', () => {
   document.body.style.opacity = '1';
   document.body.classList.add('is-loaded');
@@ -1140,6 +1234,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initGallery();
   initSharedContactStrip();
   initInteractiveContactCards();
+  initMinistryDialogs();
   initChurchChat();
   initHomeLiveLauncher();
 

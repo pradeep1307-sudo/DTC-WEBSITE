@@ -3329,7 +3329,7 @@ main::before {
 /* Live page: 1/4 vertical archive beside a 3/4 live-service player. */
 .live-page {
   display: grid;
-  grid-template-columns: minmax(230px, 1fr) minmax(0, 3fr);
+  grid-template-columns: minmax(0, 3fr) minmax(250px, 1fr);
   gap: 22px;
   align-items: stretch;
 }
@@ -3338,7 +3338,7 @@ main::before {
   margin-bottom: 0;
 }
 .live-page .previous-services {
-  grid-column: 1;
+  grid-column: 2;
   grid-row: 2;
   min-width: 0;
   height: 100%;
@@ -3347,7 +3347,7 @@ main::before {
   padding: 20px 14px;
 }
 .live-page .live-watch-panel {
-  grid-column: 2;
+  grid-column: 1;
   grid-row: 2;
   min-width: 0;
 }
