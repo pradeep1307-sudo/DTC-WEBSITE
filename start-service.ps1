@@ -5,7 +5,12 @@ param(
 $root = $PSScriptRoot
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, $Port)
-$listener.Start()
+try {
+  $listener.Start()
+} catch [System.Net.Sockets.SocketException] {
+  Write-Error "Port $Port is already in use. Denver Tamil Church may already be running at http://localhost:$Port"
+  exit 1
+}
 Write-Host "Denver Tamil Church is running at http://localhost:$Port"
 
 $mimeTypes = @{

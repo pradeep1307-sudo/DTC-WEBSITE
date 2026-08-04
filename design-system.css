@@ -871,3 +871,56 @@ body.ministry-dialog-is-open { overflow: hidden; }
   .ministry-dialog-content h2 { padding-right: 30px; font-size: 1.8rem; }
   .ministry-dialog-content li { font-size: .85rem; }
 }
+
+/* Viewport-safe overlays: controls remain visible while long content scrolls. */
+.event-slide-dialog {
+  width: min(calc(100% - 32px), 1420px);
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  overflow: hidden;
+}
+.event-slide-dialog img { max-height: calc(100dvh - 32px); }
+.event-slide-dialog .event-dialog-close {
+  top: 12px;
+  right: 12px;
+  z-index: 4;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+.gallery-dialog[open] {
+  display: grid;
+  max-height: calc(100dvh - 32px);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.gallery-dialog-bar { position: relative; z-index: 4; }
+.gallery-dialog-close {
+  flex: 0 0 40px;
+  transition: background var(--motion-fast), border-color var(--motion-fast), transform var(--motion-fast);
+}
+.gallery-dialog-close:hover,
+.gallery-dialog-close:focus-visible { border-color: #ef4c69; background: #cf1034; transform: rotate(7deg); }
+.gallery-viewer { min-height: 0; }
+.gallery-viewer-image { max-height: 100%; }
+.ministry-dialog[open] { max-height: calc(100dvh - 32px); }
+.ministry-dialog-content .btn {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  box-shadow: 0 -10px 22px rgba(255,255,255,.92);
+}
+.church-chat-close {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #171717;
+}
+@media (max-width: 720px) {
+  .event-slide-dialog,
+  .gallery-dialog,
+  .ministry-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 16px); }
+  .event-slide-dialog img { max-height: calc(100dvh - 16px); }
+  .ministry-dialog[open] { grid-template-rows: 132px minmax(0, 1fr); }
+  .ministry-dialog-visual { min-height: 0; }
+  .event-dialog-nav { width: 44px; height: 44px; }
+  .event-dialog-prev { left: 8px; }
+  .event-dialog-next { right: 8px; }
+}
