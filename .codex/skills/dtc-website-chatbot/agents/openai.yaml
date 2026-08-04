@@ -1,0 +1,4 @@
+interface:
+  display_name: "Denver Tamil Church Chatbot"
+  short_description: "Maintain the church website assistant"
+  default_prompt: "Use $dtc-website-chatbot to update the website chatbot knowledge and contact workflow."

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Stream | Denver Tamil Church</title>
+    <meta name="description" content="Watch Denver Tamil Church services live and join us for Tamil worship, prayer, and Biblical teaching." />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="page-header live-page-header">
+      <nav class="page-nav">
+        <a class="brand" href="index.html"><img class="logo" src="lOGO.png" alt="Denver Tamil Church logo" /></a>
+        <div class="nav-links"></div>
+        <div class="lang-switch">
+          <button class="lang-btn active" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="ta">TA</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="live-page">
+      <section class="live-hero-panel">
+        <p class="eyebrow"><span class="lang" data-lang="en">Worship with us online</span><span class="lang" data-lang="ta">எங்களுடன் இணையத்தில் ஆராதியுங்கள்</span></p>
+        <h1><span class="lang" data-lang="en">Live Stream</span><span class="lang" data-lang="ta">நேரலை</span></h1>
+        <p><span class="lang" data-lang="en">Join Denver Tamil Church for worship, prayer, and scripture teaching.</span><span class="lang" data-lang="ta">ஆராதனை, ஜெபம் மற்றும் வேத போதனைக்காக டென்வர் தமிழ் சபையுடன் இணையுங்கள்.</span></p>
+      </section>
+
+      <section class="live-watch-panel" aria-labelledby="live-watch-title">
+        <div class="live-watch-heading">
+          <div>
+            <span class="live-status"><span aria-hidden="true"></span><span class="lang" data-lang="en">Sunday Service</span><span class="lang" data-lang="ta">ஞாயிறு ஆராதனை</span></span>
+            <h2 id="live-watch-title"><span class="lang" data-lang="en">Watch the latest service</span><span class="lang" data-lang="ta">சமீபத்திய ஆராதனையைப் பாருங்கள்</span></h2>
+            <p><span class="lang" data-lang="en">Sundays at 4:30 PM Mountain Time</span><span class="lang" data-lang="ta">ஞாயிற்றுக்கிழமைகளில் மாலை 4:30 மணி</span></p>
+          </div>
+          <a class="btn btn-primary" href="https://www.youtube.com/@TamilChurchDenver/streams" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon" aria-hidden="true">▶</span>
+            <span class="lang" data-lang="en">Open YouTube</span><span class="lang" data-lang="ta">YouTube திறக்கவும்</span>
+          </a>
+        </div>
+        <div class="live-embed">
+          <iframe src="https://www.youtube.com/embed/2ilvyL0i358" title="Denver Tamil Church live stream" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+      </section>
+
+      <section class="live-help-card">
+        <h2><span class="lang" data-lang="en">Having trouble watching?</span><span class="lang" data-lang="ta">பார்ப்பதில் சிக்கல் உள்ளதா?</span></h2>
+        <p><span class="lang" data-lang="en">Visit our YouTube channel to see the active live broadcast and previous services.</span><span class="lang" data-lang="ta">தற்போதைய நேரலையையும் முந்தைய ஆராதனைகளையும் காண எங்கள் YouTube சேனலைப் பார்வையிடுங்கள்.</span></p>
+        <a class="link-btn" href="https://www.youtube.com/@TamilChurchDenver/streams" target="_blank" rel="noopener noreferrer"><span class="lang" data-lang="en">View all streams →</span><span class="lang" data-lang="ta">அனைத்து நேரலைகளையும் காண்க →</span></a>
+      </section>
+
+      <section class="previous-services" aria-labelledby="previous-services-title">
+        <div class="previous-services-header">
+          <div>
+            <p class="eyebrow"><span class="lang" data-lang="en">Last two months</span><span class="lang" data-lang="ta">கடந்த இரண்டு மாதங்கள்</span></p>
+            <h2 id="previous-services-title"><span class="lang" data-lang="en">Previous Services</span><span class="lang" data-lang="ta">முந்தைய ஆராதனைகள்</span></h2>
+          </div>
+          <div class="previous-services-controls">
+            <button class="previous-services-arrow previous-services-arrow--left" type="button" aria-label="Browse previous videos to the left">←</button>
+            <button class="previous-services-arrow previous-services-arrow--right" type="button" aria-label="Browse previous videos to the right">→</button>
+          </div>
+        </div>
+        <div class="previous-services-track" aria-live="polite">
+          <p class="previous-services-loading"><span class="lang" data-lang="en">Loading previous services…</span><span class="lang" data-lang="ta">முந்தைய ஆராதனைகள் ஏற்றப்படுகின்றன…</span></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer page-footer"><div><p>@2004 DENVER TAMIL CHURCH · 9052 W Ken Caryl Ave · Littleton, CO 80128</p></div></footer>
+    <script src="script.js"></script>
+  </body>
+</html>
