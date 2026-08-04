@@ -1,0 +1,119 @@
+/* Denver Tamil Church design system: authoritative shared visual layer. */
+:root {
+  --color-ink: #111111;
+  --color-text: #292929;
+  --color-muted: #595959;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f4f4f4;
+  --color-surface-dark: #151515;
+  --color-border: #d4d4d4;
+  --color-border-strong: #777777;
+  --color-accent: #cf1034;
+  --color-focus: #1769e0;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 6px 16px rgba(0, 0, 0, .07);
+  --shadow-md: 0 12px 30px rgba(0, 0, 0, .1);
+  --shadow-lg: 0 18px 42px rgba(0, 0, 0, .15);
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --content-wide: 1280px;
+  --motion-fast: 180ms ease;
+  --motion-standard: 240ms cubic-bezier(.2, .8, .2, 1);
+}
+
+html { color-scheme: light; }
+body {
+  color: var(--color-text);
+  background-color: #f3f3f3;
+  font-family: 'Lato', Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 {
+  color: var(--color-ink);
+  font-weight: 900;
+  text-wrap: balance;
+}
+p, li, address { text-wrap: pretty; }
+img { height: auto; }
+
+.page-nav,
+.home-page-header {
+  border-color: rgba(0, 0, 0, .12);
+  box-shadow: var(--shadow-sm);
+}
+.nav-links a,
+.btn,
+.link-btn,
+.card-action {
+  font-weight: 800;
+  letter-spacing: .01em;
+}
+.btn,
+.link-btn {
+  min-height: 42px;
+  border-radius: var(--radius-sm);
+  transition: color var(--motion-fast), background var(--motion-fast), border-color var(--motion-fast), transform var(--motion-fast), box-shadow var(--motion-fast);
+}
+.btn:hover,
+.link-btn:hover { transform: translateY(-2px); }
+.btn:active,
+.link-btn:active { transform: translateY(0) scale(.98); }
+
+.feature-card,
+.service-card,
+.event-card,
+.detail-card,
+.quick-info-card,
+.mission-card,
+.give-option:not(.give-option--primary),
+.contact-form,
+.contact-detail-block,
+.shared-contact-card,
+.live-watch-panel,
+.live-help-card,
+.previous-services,
+.gallery-albums,
+.gallery-album-card,
+.home-who-content > section {
+  border-color: var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+:where(button, .btn, .link-btn, .nav-links a) { touch-action: manipulation; }
+
+.footer,
+.page-footer {
+  border-top: 1px solid #333;
+  background: #0c0c0c;
+  color: #ededed;
+}
+
+@media (max-width: 720px) {
+  :root { --space-5: 20px; --space-6: 26px; }
+  body { line-height: 1.55; }
+  .btn, .link-btn { min-height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
