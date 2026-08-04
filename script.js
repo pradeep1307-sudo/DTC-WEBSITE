@@ -108,16 +108,16 @@ const featuredHeroImages = {
     'assets/WhatsApp Image 2024-12-25 at 20.59.50_7dd35547.jpg'
   ],
   who: [
-    'assets/images/church-sanctuary-hero.png',
+    'assets/images/church-sanctuary-hero.jpg',
     'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=1600&q=85'
   ],
-  give: ['assets/images/church-giving-hero.png'],
-  missions: ['assets/images/church-missions-hero.png'],
-  contact: ['assets/images/church-location-banner.png']
+  give: ['assets/images/church-giving-hero.jpg'],
+  missions: ['assets/images/church-missions-hero.jpg'],
+  contact: ['assets/images/church-location-banner.jpg']
 };
 
 const homeHeroSlides = [
-  { src: 'assets/images/church-sanctuary-hero.png', tone: 'dark' },
+  { src: 'assets/images/church-sanctuary-hero.jpg', tone: 'dark' },
   // Church worship and faith imagery only — no generic landscapes or stock scenes.
   { src: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=2000&q=88', tone: 'bright' },
   { src: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=2000&q=88', tone: 'dark' }
@@ -213,7 +213,7 @@ const addUpcomingEventSlide = () => {
   const poster = document.createElement('button');
   poster.type = 'button';
   poster.className = 'event-poster';
-  poster.innerHTML = `<img src="${slideSource}" alt="Denver Tamil Church Power Surge summer events poster" /><span class="event-poster-caption"><span class="lang" data-lang="en">View upcoming events</span><span class="lang" data-lang="ta">வரவிருக்கும் நிகழ்வுகளைப் பார்க்கவும்</span></span>`;
+  poster.innerHTML = `<img src="${slideSource}" alt="Denver Tamil Church Power Surge summer events poster" width="1672" height="941" loading="lazy" /><span class="event-poster-caption"><span class="lang" data-lang="en">View upcoming events</span><span class="lang" data-lang="ta">வரவிருக்கும் நிகழ்வுகளைப் பார்க்கவும்</span></span>`;
   events.append(poster);
 
   const dialog = document.createElement('dialog');
@@ -263,7 +263,7 @@ const addUpcomingEventCarousel = async () => {
   eventGrid.remove();
   const carousel = document.createElement('div');
   carousel.className = 'event-carousel upcoming-event-card';
-  carousel.innerHTML = `<button class="event-carousel-slide" type="button" aria-label="Open upcoming event slide"><span class="event-carousel-caption"><span class="lang" data-lang="en"></span><span class="lang" data-lang="ta"></span></span><img alt="Denver Tamil Church upcoming event slide" /></button><div class="event-carousel-dots" aria-label="Event slide navigation"></div>`;
+  carousel.innerHTML = `<button class="event-carousel-slide" type="button" aria-label="Open upcoming event slide"><span class="event-carousel-caption"><span class="lang" data-lang="en"></span><span class="lang" data-lang="ta"></span></span><img alt="Denver Tamil Church upcoming event slide" width="1672" height="941" loading="lazy" /></button><div class="event-carousel-dots" aria-label="Event slide navigation"></div>`;
   events.append(carousel);
 
   const dialog = document.createElement('dialog');
@@ -562,7 +562,7 @@ const initPreviousServices = async () => {
       <article class="previous-service-card">
         <a href="${video.url}" target="_blank" rel="noopener noreferrer">
           <span class="previous-service-image">
-            <img src="${video.thumbnail}" alt="" loading="lazy" />
+            <img src="${video.thumbnail}" alt="" width="480" height="360" loading="lazy" />
             <span class="previous-service-play" aria-hidden="true">▶</span>
           </span>
           <span class="previous-service-content">
@@ -591,14 +591,14 @@ const initGallery = async () => {
   if (!grid || !dialog || !dialogTitle || !count || !viewerImage || !thumbnails || !previous || !next) return;
 
   const albumCovers = {
-    'sunday-services': 'assets/images/church-sanctuary-hero.png',
+    'sunday-services': 'assets/images/church-sanctuary-hero.jpg',
     'vbs': 'assets/upcoming/ChatGPT%20Image%20Jul%2011%2C%202026%2C%2010_38_46%20PM.png',
-    'prayer-night': 'assets/images/church-sanctuary-hero.png',
+    'prayer-night': 'assets/images/church-sanctuary-hero.jpg',
     'christmas': 'assets/upcoming/ChatGPT%20Image%20Aug%202%2C%202026%2C%2009_16_32%20AM.png',
     'easter': 'assets/upcoming/ChatGPT%20Image%20Jul%2012%2C%202026%2C%2005_28_37%20PM%20%282%29.png',
     'youth': 'assets/upcoming/ChatGPT%20Image%20Aug%202%2C%202026%2C%2001_32_27%20PM.png',
     'womens-ministry': 'assets/upcoming/ChatGPT%20Image%20Aug%202%2C%202026%2C%2008_22_15%20PM.png',
-    'community-outreach': 'assets/images/church-missions-hero.png'
+    'community-outreach': 'assets/images/church-missions-hero.jpg'
   };
 
   let activeImages = [];
@@ -639,7 +639,7 @@ const initGallery = async () => {
     if (!Array.isArray(albums)) throw new Error('Invalid gallery data');
     grid.innerHTML = albums.map((album, index) => {
       const hasPhotos = album.images.length > 0;
-      const cover = album.images[0] || albumCovers[album.slug] || 'assets/images/church-sanctuary-hero.png';
+      const cover = album.images[0] || albumCovers[album.slug] || 'assets/images/church-sanctuary-hero.jpg';
       return `<article class="gallery-album-card${hasPhotos ? '' : ' is-empty'}">
         <button type="button" data-album-index="${index}"${hasPhotos ? '' : ' disabled'}>
           <span class="gallery-album-cover"><img src="${cover}" alt="${album.name} album cover" loading="lazy" /></span>
@@ -714,7 +714,7 @@ const initChurchChat = () => {
     shell.className = 'church-chat-shell';
     shell.innerHTML = `
       <button class="church-chat-launcher" type="button" aria-controls="church-chat-panel" aria-expanded="false">
-        <span class="church-chat-launcher-icon" aria-hidden="true"><img src="assets/lOGO.png" alt="" /></span><span>Ask Us</span>
+        <span class="church-chat-launcher-icon" aria-hidden="true"><img src="assets/lOGO.png" alt="" width="142" height="94" /></span><span>Ask Us</span>
       </button>
       <div class="church-chat-backdrop" aria-hidden="true"></div>
       <section class="church-chat" id="church-chat-panel" aria-labelledby="church-chat-title" aria-hidden="true">
@@ -731,7 +731,7 @@ const initChurchChat = () => {
           </div>
         </div>
         <div class="church-chat-window">
-          <div class="church-chat-header"><span class="church-chat-avatar" aria-hidden="true"><img src="assets/lOGO.png" alt="" /></span><div><strong>Denver Tamil Church Assistant</strong><span><i aria-hidden="true"></i> Ready to help</span></div></div>
+          <div class="church-chat-header"><span class="church-chat-avatar" aria-hidden="true"><img src="assets/lOGO.png" alt="" width="142" height="94" /></span><div><strong>Denver Tamil Church Assistant</strong><span><i aria-hidden="true"></i> Ready to help</span></div></div>
           <div class="church-chat-messages" role="log" aria-live="polite" aria-relevant="additions"><div class="church-chat-message is-bot">Welcome! Ask me a question about Denver Tamil Church or anything published on this website.</div></div>
           <form class="church-chat-form"><label class="sr-only" for="church-chat-input">Ask the church website assistant</label><input id="church-chat-input" type="text" placeholder="Type your question…" autocomplete="off" maxlength="240" required /><button type="submit" aria-label="Send question">Send</button></form>
           <p class="church-chat-disclaimer">Answers come from this website. For personal or urgent requests, please contact the church directly.</p>

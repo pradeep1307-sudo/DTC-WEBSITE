@@ -3121,13 +3121,13 @@ main::before {
   background-repeat: no-repeat;
 }
 .home-quick-info-layout .quick-info-card:nth-child(1)::before {
-  background-image: linear-gradient(rgba(8, 28, 46, .16), rgba(8, 28, 46, .16)), url('assets/images/church-sanctuary-hero.png');
+  background-image: linear-gradient(rgba(8, 28, 46, .16), rgba(8, 28, 46, .16)), url('assets/images/church-sanctuary-hero.jpg');
 }
 .home-quick-info-layout .quick-info-card:nth-child(2)::before {
-  background-image: linear-gradient(rgba(8, 28, 46, .1), rgba(8, 28, 46, .1)), url('assets/images/church-location-banner.png');
+  background-image: linear-gradient(rgba(8, 28, 46, .1), rgba(8, 28, 46, .1)), url('assets/images/church-location-banner.jpg');
 }
 .home-quick-info-layout .quick-info-card:nth-child(3)::before {
-  background-image: linear-gradient(rgba(8, 28, 46, .22), rgba(8, 28, 46, .22)), url('assets/images/church-missions-hero.png');
+  background-image: linear-gradient(rgba(8, 28, 46, .22), rgba(8, 28, 46, .22)), url('assets/images/church-missions-hero.jpg');
 }
 .home-quick-info-layout .quick-info-icon { display: none; }
 .home-quick-info-layout .quick-info-card h2,
@@ -3490,7 +3490,7 @@ body {
   color: #111;
   background:
     linear-gradient(rgba(248, 248, 248, .91), rgba(238, 238, 238, .94)),
-    url('assets/images/church-sanctuary-hero.png') center / cover fixed no-repeat,
+    url('assets/images/church-sanctuary-hero.jpg') center / cover fixed no-repeat,
     #f2f2f2;
 }
 .home-page-header,
@@ -3749,13 +3749,13 @@ a,
   background-repeat: no-repeat;
 }
 .shared-contact-card--visit .shared-contact-image {
-  background-image: linear-gradient(rgba(8,28,46,.08), rgba(8,28,46,.08)), url('assets/images/church-location-banner.png');
+  background-image: linear-gradient(rgba(8,28,46,.08), rgba(8,28,46,.08)), url('assets/images/church-location-banner.jpg');
 }
 .shared-contact-card--call .shared-contact-image {
-  background-image: linear-gradient(rgba(8,28,46,.12), rgba(8,28,46,.12)), url('assets/images/church-sanctuary-hero.png');
+  background-image: linear-gradient(rgba(8,28,46,.12), rgba(8,28,46,.12)), url('assets/images/church-sanctuary-hero.jpg');
 }
 .shared-contact-card--email .shared-contact-image {
-  background-image: linear-gradient(rgba(8,28,46,.16), rgba(8,28,46,.16)), url('assets/images/church-missions-hero.png');
+  background-image: linear-gradient(rgba(8,28,46,.16), rgba(8,28,46,.16)), url('assets/images/church-missions-hero.jpg');
 }
 .shared-contact-content {
   display: flex;
@@ -3806,10 +3806,10 @@ a,
   background-image: linear-gradient(rgba(8, 28, 46, .1), rgba(8, 28, 46, .18)), url('assets/upcoming/ChatGPT Image Aug 2, 2026, 09_16_32 AM.png');
 }
 .mission-grid .mission-card:nth-child(2)::before {
-  background-image: linear-gradient(rgba(8, 28, 46, .08), rgba(8, 28, 46, .16)), url('assets/images/mission-global.png');
+  background-image: linear-gradient(rgba(8, 28, 46, .08), rgba(8, 28, 46, .16)), url('assets/images/mission-global.jpg');
 }
 .mission-grid .mission-card:nth-child(3)::before {
-  background-image: linear-gradient(rgba(8, 28, 46, .06), rgba(8, 28, 46, .14)), url('assets/images/mission-discipleship.png');
+  background-image: linear-gradient(rgba(8, 28, 46, .06), rgba(8, 28, 46, .14)), url('assets/images/mission-discipleship.jpg');
 }
 .mission-grid .mission-number {
   z-index: 1;
@@ -3895,13 +3895,13 @@ a,
   background-repeat: no-repeat;
 }
 .contact-details .contact-detail-block:nth-child(1)::before {
-  background-image: linear-gradient(rgba(8, 28, 46, .12), rgba(8, 28, 46, .12)), url('assets/images/church-location-banner.png');
+  background-image: linear-gradient(rgba(8, 28, 46, .12), rgba(8, 28, 46, .12)), url('assets/images/church-location-banner.jpg');
 }
 .contact-details .contact-detail-block:nth-child(2)::before {
-  background-image: linear-gradient(rgba(8, 28, 46, .18), rgba(8, 28, 46, .18)), url('assets/images/church-sanctuary-hero.png');
+  background-image: linear-gradient(rgba(8, 28, 46, .18), rgba(8, 28, 46, .18)), url('assets/images/church-sanctuary-hero.jpg');
 }
 .contact-details .contact-detail-block:nth-child(3)::before {
-  background-image: linear-gradient(rgba(8, 28, 46, .14), rgba(8, 28, 46, .14)), url('assets/images/church-missions-hero.png');
+  background-image: linear-gradient(rgba(8, 28, 46, .14), rgba(8, 28, 46, .14)), url('assets/images/church-missions-hero.jpg');
 }
 .contact-details .contact-detail-block > span { display: none; }
 .contact-details .contact-detail-block h2 { margin-top: 0; }
@@ -4152,7 +4152,7 @@ li { line-height: 1.65; }
 .home-who-heading > p:last-child { max-width: 680px; margin: 8px auto 0; color: var(--muted); }
 .home-beliefs { padding: clamp(24px, 4vw, 42px); }
 .home-beliefs-layout { display: grid; grid-template-columns: minmax(280px, .9fr) minmax(0, 1.1fr); gap: clamp(24px, 4vw, 48px); align-items: center; }
-.home-beliefs-image { min-height: 310px; border-radius: 16px; background: linear-gradient(rgba(0,0,0,.12), rgba(0,0,0,.28)), url('assets/images/church-sanctuary-hero.png') center / cover no-repeat; }
+.home-beliefs-image { min-height: 310px; border-radius: 16px; background: linear-gradient(rgba(0,0,0,.12), rgba(0,0,0,.28)), url('assets/images/church-sanctuary-hero.jpg') center / cover no-repeat; }
 .home-beliefs-copy { display: grid; gap: 14px; }
 .home-beliefs-copy p { color: var(--muted); font-size: 1rem; }
 .home-who-kicker { color: #222; font-size: .78rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
