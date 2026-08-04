@@ -5,23 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact | Denver Tamil Church</title>
     <meta name="description" content="Contact Denver Tamil Church for prayer requests, visit details, or questions." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;800;900&display=swap" rel="stylesheet" />
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="design-system.css" />
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="page-header contact-header">
       <nav class="page-nav">
         <a class="brand" href="index.html"><img class="logo" src="lOGO.png" alt="Denver Tamil Church logo" width="142" height="94" /></a>
         <div class="nav-links"></div>
         <div class="lang-switch">
-          <button class="lang-btn active" data-lang="en">EN</button>
-          <button class="lang-btn" data-lang="ta">TA</button>
+          <button class="lang-btn active" type="button" data-lang="en">EN</button>
+          <button class="lang-btn" type="button" data-lang="ta">TA</button>
         </div>
       </nav>
     </header>
 
-    <main class="contact-page">
+    <main class="contact-page" id="main-content">
       <section class="contact-hero-panel">
         <p class="eyebrow"><span class="lang" data-lang="en">We would love to meet you</span><span class="lang" data-lang="ta">உங்களைச் சந்திக்க விரும்புகிறோம்</span></p>
         <h1><span class="lang" data-lang="en">Contact Us</span><span class="lang" data-lang="ta">எங்களைத் தொடர்பு கொள்ளுங்கள்</span></h1>
@@ -29,18 +33,26 @@
       </section>
 
       <section class="contact-layout">
-        <form class="contact-form" action="mailto:info@denvertamilchurch.com" method="post" enctype="text/plain">
+        <form class="contact-form" id="contact-form" action="mailto:info@denvertamilchurch.com" method="post" enctype="text/plain">
           <h2><span class="lang" data-lang="en">Send a Message</span><span class="lang" data-lang="ta">ஒரு செய்தி அனுப்புங்கள்</span></h2>
           <p class="contact-form-note"><span class="lang" data-lang="en">We’ll respond as soon as possible. Fields marked * are required.</span><span class="lang" data-lang="ta">கூடிய விரைவில் பதிலளிப்போம். * குறிக்கப்பட்ட புலங்கள் அவசியம்.</span></p>
           <label><span class="lang" data-lang="en">Your Name *</span><span class="lang" data-lang="ta">உங்கள் பெயர் *</span><input type="text" name="name" autocomplete="name" placeholder="First and last name" required /></label>
           <label><span class="lang" data-lang="en">Email Address *</span><span class="lang" data-lang="ta">மின்னஞ்சல் முகவரி *</span><input type="email" name="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required /></label>
           <label><span class="lang" data-lang="en">Phone (optional)</span><span class="lang" data-lang="ta">தொலைபேசி (விருப்பமானது)</span><input type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="(720) 555-0123" /></label>
           <label><span class="lang" data-lang="en">Subject *</span><span class="lang" data-lang="ta">பொருள் *</span>
-            <select name="subject" required>
+            <select name="subject" id="contact-subject" required>
               <option value="">Choose a topic / தலைப்பைத் தேர்ந்தெடுக்கவும்</option>
-              <option>Prayer Request / ஜெபக் கோரிக்கை</option>
-              <option>Plan a Visit / வருகையைத் திட்டமிடுங்கள்</option>
-              <option>General Question / பொதுக் கேள்வி</option>
+              <option value="Prayer Request">Prayer Request / ஜெபக் கோரிக்கை</option>
+              <option value="Plan a Visit">Plan a Visit / வருகையைத் திட்டமிடுங்கள்</option>
+              <optgroup label="Ministry Requests / ஊழிய கோரிக்கைகள்">
+                <option value="Kids Ministry">Kids Ministry / குழந்தைகள் ஊழியம்</option>
+                <option value="Teen & Young Adult Ministry">Teen &amp; Young Adult Ministry / இளைஞர் ஊழியம்</option>
+                <option value="Men's Ministry">Men’s Ministry / ஆண்கள் ஊழியம்</option>
+                <option value="Women's Ministry">Women’s Ministry / பெண்கள் ஊழியம்</option>
+                <option value="Mission">Mission &amp; Outreach / மிஷன்</option>
+                <option value="General Ministry Request">General Ministry Request / பொது ஊழிய கோரிக்கை</option>
+              </optgroup>
+              <option value="General Question">General Question / பொதுக் கேள்வி</option>
             </select>
           </label>
           <label class="contact-form-message"><span class="lang" data-lang="en">Your Message *</span><span class="lang" data-lang="ta">உங்கள் செய்தி *</span><textarea name="message" rows="6" placeholder="How can we help?" required></textarea></label>

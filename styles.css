@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;800;900&display=swap');
-
 :root {
   --bg: #eef6ff;
   --surface: #ffffff;
@@ -3803,13 +3801,13 @@ a,
   background-repeat: no-repeat;
 }
 .mission-grid .mission-card:nth-child(1)::before {
-  background-image: linear-gradient(rgba(8, 28, 46, .1), rgba(8, 28, 46, .18)), url('assets/upcoming/ChatGPT Image Aug 2, 2026, 09_16_32 AM.png');
+  background-image: linear-gradient(rgba(8, 28, 46, .1), rgba(8, 28, 46, .18)), url('assets/images/mission-local-generated.jpg');
 }
 .mission-grid .mission-card:nth-child(2)::before {
-  background-image: linear-gradient(rgba(8, 28, 46, .08), rgba(8, 28, 46, .16)), url('assets/images/mission-global.jpg');
+  background-image: linear-gradient(rgba(8, 28, 46, .08), rgba(8, 28, 46, .16)), url('assets/images/mission-global-generated.jpg');
 }
 .mission-grid .mission-card:nth-child(3)::before {
-  background-image: linear-gradient(rgba(8, 28, 46, .06), rgba(8, 28, 46, .14)), url('assets/images/mission-discipleship.jpg');
+  background-image: linear-gradient(rgba(8, 28, 46, .06), rgba(8, 28, 46, .14)), url('assets/images/mission-discipleship-generated.jpg');
 }
 .mission-grid .mission-number {
   z-index: 1;

@@ -8,7 +8,9 @@ const setLanguage = (language) => {
   });
 
   langButtons.forEach((button) => {
-    button.classList.toggle('active', button.dataset.lang === language);
+    const isActive = button.dataset.lang === language;
+    button.classList.toggle('active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
   });
 
   updateDocumentLanguage(language);
@@ -19,6 +21,7 @@ const pageTranslations = {
   en: {
     titles: {
       'index.html': 'Denver Tamil Church',
+      'ministry.html': 'Ministry | Denver Tamil Church',
       'missions.html': 'Missions & Ministries | Denver Tamil Church',
       'gallery.html': 'Gallery | Denver Tamil Church',
       'give.html': 'Give | Denver Tamil Church',
@@ -26,6 +29,7 @@ const pageTranslations = {
     },
     descriptions: {
       'index.html': 'Denver Tamil Church is a welcoming Tamil church in Denver for worship, prayer, and community.',
+      'ministry.html': 'Explore Kids, Teen and Young Adult, Men’s, and Women’s ministry at Denver Tamil Church.',
       'missions.html': 'See how Denver Tamil Church serves families, faith, and community with practical ministries.',
       'gallery.html': 'View photos from worship services, ministries, and events at Denver Tamil Church.',
       'give.html': 'Support the church through generous giving and prayer partnership.',
@@ -342,7 +346,10 @@ const addUpcomingEventCarousel = async () => {
 
 const siteNavigation = [
   { page: 'index.html', href: 'index.html', en: 'Who We Are', ta: 'நாங்கள் யார்' },
-  { page: 'missions.html', href: 'missions.html', en: 'Missions', ta: 'ஊழியங்கள்' },
+  { page: 'ministry.html', href: 'ministry.html', en: 'Ministries', ta: 'ஊழியங்கள்', children: [
+    { page: 'ministry.html', href: 'ministry.html', en: 'Ministry', ta: 'ஊழியம்' },
+    { page: 'missions.html', href: 'missions.html', en: 'Mission', ta: 'மிஷன்' }
+  ] },
   { page: 'live.html', href: 'live.html', en: 'Live Stream', ta: 'நேரலை' },
   { page: 'give.html', href: 'give.html', en: 'Give', ta: 'கொடுங்கள்' },
   { page: 'contact.html', href: 'contact.html', en: 'Contact', ta: 'தொடர்பு' },
@@ -351,14 +358,51 @@ const siteNavigation = [
 
 const normalizeNavigation = () => {
   const currentPage = getPageKey();
-  const activePage = currentPage;
-  document.querySelectorAll('.nav-links').forEach((nav) => {
+  document.querySelectorAll('.nav-links').forEach((nav, index) => {
     nav.innerHTML = siteNavigation.map((item) => {
-      const isActive = item.page === activePage;
+      const isActive = item.page === currentPage || item.children?.some((child) => child.page === currentPage);
+      if (item.children) {
+        const menuId = `ministry-menu-${index}`;
+        const submenu = item.children.map((child) => {
+          const childActive = child.page === currentPage;
+          return `<a class="nav-submenu-link${childActive ? ' nav-link--active' : ''}" href="${child.href}"${childActive ? ' aria-current="page"' : ''}><span class="lang" data-lang="en">${child.en}</span><span class="lang" data-lang="ta">${child.ta}</span></a>`;
+        }).join('');
+        return `<div class="nav-dropdown${isActive ? ' nav-dropdown--active' : ''}"><button class="nav-link nav-dropdown-toggle${isActive ? ' nav-link--active' : ''}" type="button" aria-expanded="false" aria-controls="${menuId}"><span class="lang" data-lang="en">${item.en}</span><span class="lang" data-lang="ta">${item.ta}</span><span class="nav-dropdown-arrow" aria-hidden="true"></span></button><div class="nav-submenu" id="${menuId}">${submenu}</div></div>`;
+      }
       return `<a class="nav-link${isActive ? ' nav-link--active' : ''}" href="${item.href}"${isActive ? ' aria-current="page"' : ''}><span class="lang" data-lang="en">${item.en}</span><span class="lang" data-lang="ta">${item.ta}</span></a>`;
     }).join('');
+
+    const dropdown = nav.querySelector('.nav-dropdown');
+    const toggle = nav.querySelector('.nav-dropdown-toggle');
+    toggle?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const isOpen = dropdown.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', String(isOpen));
+    });
+    dropdown?.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        dropdown.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.focus();
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (!dropdown?.contains(event.target)) {
+        dropdown?.classList.remove('is-open');
+        toggle?.setAttribute('aria-expanded', 'false');
+      }
+    });
   });
   setLanguage(localStorage.getItem('siteLanguage') || 'en');
+};
+
+const initContactSubject = () => {
+  const subjectSelect = document.querySelector('#contact-subject');
+  if (!subjectSelect) return;
+  const requestedSubject = new URLSearchParams(window.location.search).get('subject');
+  if (!requestedSubject) return;
+  const hasOption = [...subjectSelect.options].some((option) => option.value === requestedSubject);
+  if (hasOption) subjectSelect.value = requestedSubject;
 };
 
 const initStickyNavigation = () => {
@@ -391,11 +435,41 @@ const initSharedHeaderIdentity = () => {
   headers.forEach((header) => {
     const brand = header.querySelector('.brand');
     brand?.querySelector('.brand-name')?.remove();
-    if (brand && !brand.querySelector('.header-service-time')) {
-      const serviceTime = document.createElement('span');
-      serviceTime.className = 'header-service-time';
-      serviceTime.innerHTML = '<span class="lang" data-lang="en"><strong>Sunday Service</strong><small>4:30PM</small></span><span class="lang" data-lang="ta"><strong>ஞாயிறு ஆராதனை</strong><small>மாலை 4:30</small></span>';
-      brand.append(serviceTime);
+    if (brand && !header.querySelector('.header-service-countdown')) {
+      let brandCluster = brand.closest('.brand-wrapper, .header-brand-cluster');
+      if (!brandCluster) {
+        brandCluster = document.createElement('div');
+        brandCluster.className = 'header-brand-cluster';
+        brand.before(brandCluster);
+        brandCluster.append(brand);
+      } else {
+        brandCluster.classList.add('header-brand-cluster');
+      }
+
+      const widget = document.createElement('div');
+      const panelId = `service-countdown-${Math.random().toString(36).slice(2, 8)}`;
+      widget.className = 'header-service-countdown';
+      widget.innerHTML = `<button class="header-service-time" type="button" aria-expanded="false" aria-controls="${panelId}"><span class="service-time-line"><span class="lang" data-lang="en"><strong>Sunday Service</strong><i aria-hidden="true">|</i><small>4:30 PM</small></span><span class="lang" data-lang="ta"><strong>ஞாயிறு ஆராதனை</strong><i aria-hidden="true">|</i><small>மாலை 4:30</small></span><span class="service-countdown-chevron" aria-hidden="true"></span></span><span class="service-countdown-compact" aria-label="Time remaining until Sunday service"><b data-countdown-compact="days">00</b>D <i>:</i> <b data-countdown-compact="hours">00</b>H <i>:</i> <b data-countdown-compact="minutes">00</b>M <i>:</i> <b data-countdown-compact="seconds">00</b>S</span></button><div class="service-countdown-panel" id="${panelId}"><p>COUNTDOWN TO SUNDAY</p><strong class="service-countdown-next-date"></strong><div class="service-countdown-values"><span><strong data-countdown="days">00</strong><small>Day(s)</small></span><span><strong data-countdown="hours">00</strong><small>Hour(s)</small></span><span><strong data-countdown="minutes">00</strong><small>Minute(s)</small></span><span><strong data-countdown="seconds">00</strong><small>Second(s)</small></span></div><div class="service-countdown-details"><span><strong>Worship Service</strong> · Sundays at 4:30 PM</span><span>9052 W Ken Caryl Ave · Littleton, CO</span></div><div class="service-countdown-actions"><a href="live.html">Watch Live →</a><a href="contact.html">Plan Your Visit →</a></div></div>`;
+      brandCluster.append(widget);
+
+      const toggle = widget.querySelector('.header-service-time');
+      toggle.addEventListener('click', () => {
+        const open = widget.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', String(open));
+      });
+      widget.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          widget.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+          toggle.focus();
+        }
+      });
+      document.addEventListener('click', (event) => {
+        if (!widget.contains(event.target)) {
+          widget.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
     }
     if (header.querySelector('.header-social-links')) return;
 
@@ -412,6 +486,56 @@ const initSharedHeaderIdentity = () => {
     });
     header.append(socialGroup);
   });
+
+  const zonedParts = (date) => Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Denver', year: 'numeric', month: 'numeric', day: 'numeric',
+    hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23', weekday: 'short'
+  }).formatToParts(date).filter((part) => part.type !== 'literal').map((part) => [part.type, part.value]));
+  const getNextService = () => {
+    const now = new Date();
+    const local = zonedParts(now);
+    const weekdayIndex = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(local.weekday);
+    let daysUntil = (7 - weekdayIndex) % 7;
+    if (daysUntil === 0 && (Number(local.hour) > 16 || (Number(local.hour) === 16 && Number(local.minute) >= 30))) daysUntil = 7;
+    const desired = Date.UTC(Number(local.year), Number(local.month) - 1, Number(local.day) + daysUntil, 16, 30, 0);
+    let target = desired;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const actual = zonedParts(new Date(target));
+      const actualAsUtc = Date.UTC(Number(actual.year), Number(actual.month) - 1, Number(actual.day), Number(actual.hour), Number(actual.minute), Number(actual.second));
+      target += desired - actualAsUtc;
+    }
+    return target;
+  };
+  let nextService = getNextService();
+  document.querySelectorAll('.service-countdown-next-date').forEach((node) => {
+    node.textContent = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Denver', weekday: 'long', month: 'long', day: 'numeric',
+      hour: 'numeric', minute: '2-digit', timeZoneName: 'short'
+    }).format(new Date(nextService));
+  });
+  const updateCountdown = () => {
+    if (Date.now() >= nextService) {
+      nextService = getNextService();
+      document.querySelectorAll('.service-countdown-next-date').forEach((node) => {
+        node.textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Denver', weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(new Date(nextService));
+      });
+    }
+    const remaining = Math.max(0, nextService - Date.now());
+    const values = {
+      days: Math.floor(remaining / 86400000),
+      hours: Math.floor((remaining % 86400000) / 3600000),
+      minutes: Math.floor((remaining % 3600000) / 60000),
+      seconds: Math.floor((remaining % 60000) / 1000)
+    };
+    document.querySelectorAll('[data-countdown]').forEach((node) => {
+      node.textContent = String(values[node.dataset.countdown]).padStart(2, '0');
+    });
+    document.querySelectorAll('[data-countdown-compact]').forEach((node) => {
+      node.textContent = String(values[node.dataset.countdownCompact]).padStart(2, '0');
+    });
+  };
+  updateCountdown();
+  window.setInterval(updateCountdown, 1000);
 };
 
 const removeRepeatedContent = () => {
@@ -1001,6 +1125,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.body.classList.add('is-loaded');
   restoreHomeMenuPosition();
   normalizeNavigation();
+  initContactSubject();
   initSharedHeaderIdentity();
   initStickyNavigation();
   removeRepeatedContent();
