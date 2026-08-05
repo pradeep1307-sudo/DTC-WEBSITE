@@ -979,16 +979,16 @@ body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; 
 .daily-verse-notice.is-visible { opacity: 1; transform: translateY(0) scale(1); }
 .daily-verse-notice.is-closing { opacity: 0; transform: translateY(12px) scale(.98); }
 .daily-verse-mark { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: #e1193e; color: #fff; font-size: .9rem; box-shadow: 0 0 0 3px rgba(225,25,62,.14); }
-.daily-verse-copy > span { display: block; margin-bottom: 2px; color: #ff6b85; font-size: .52rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
-.daily-verse-copy > span small { margin-left: 4px; color: #aaa; font-size: .48rem; }
-.daily-verse-copy blockquote { display: -webkit-box; margin: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: #fff; font-family: Georgia, 'Times New Roman', serif; font-size: .72rem; font-weight: 700; line-height: 1.3; }
-.daily-verse-copy cite { display: block; margin-top: 3px; color: #cfcfcf; font-size: .55rem; font-style: normal; font-weight: 800; }
+.daily-verse-copy > span { display: block; margin-bottom: 2px; color: #ff6b85; font-size: .6rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.daily-verse-copy > span small { margin-left: 4px; color: #aaa; font-size: .54rem; }
+.daily-verse-copy blockquote { margin: 0; color: #fff; font-family: Georgia, 'Times New Roman', serif; font-size: .82rem; font-weight: 700; line-height: 1.35; }
+.daily-verse-copy cite { display: block; margin-top: 3px; color: #cfcfcf; font-size: .62rem; font-style: normal; font-weight: 800; }
 .daily-verse-close { position: absolute; top: 5px; right: 5px; display: grid; width: 26px; height: 26px; padding: 0; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #bbb; font-size: 1.05rem; line-height: 1; cursor: pointer; transition: color 160ms ease, background 160ms ease, transform 160ms ease; }
 .daily-verse-close:hover,.daily-verse-close:focus-visible { background: rgba(255,255,255,.12); color: #fff; transform: rotate(7deg); }
 @media (max-width: 620px) {
   .daily-verse-notice { top: 88px; left: 8px; width: min(calc(100% - 16px), 290px); padding: 9px 34px 9px 10px; grid-template-columns: 28px minmax(0,1fr); gap: 8px; border-radius: 11px; }
   .daily-verse-mark { width: 28px; height: 28px; font-size: .82rem; }
-  .daily-verse-copy blockquote { font-size: .67rem; }
+  .daily-verse-copy blockquote { font-size: .76rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   .daily-verse-notice,.daily-verse-close { transition: none; }

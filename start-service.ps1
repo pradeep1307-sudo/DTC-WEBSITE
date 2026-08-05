@@ -25,6 +25,8 @@ try {
     $client = $listener.AcceptTcpClient()
     try {
       $stream = $client.GetStream()
+      $stream.ReadTimeout = 5000
+      $stream.WriteTimeout = 10000
       $reader = [IO.StreamReader]::new($stream, [Text.Encoding]::ASCII, $false, 1024, $true)
       $requestLine = $reader.ReadLine()
       while ($reader.ReadLine()) { }
@@ -141,7 +143,10 @@ try {
         $bytes = [IO.File]::ReadAllBytes($candidate)
         $extension = [IO.Path]::GetExtension($candidate).ToLowerInvariant()
         $contentType = if ($mimeTypes.ContainsKey($extension)) { $mimeTypes[$extension] } else { 'application/octet-stream' }
-        $header = "HTTP/1.1 200 OK`r`nContent-Type: $contentType`r`nContent-Length: $($bytes.Length)`r`nConnection: close`r`n`r`n"
+        $cacheHeader = if ($requestPath -in @('assets/upcoming/events.json', 'assets/upcoming/manifest.json')) {
+          "Cache-Control: no-store, no-cache, must-revalidate, max-age=0`r`nPragma: no-cache`r`nExpires: 0`r`n"
+        } else { '' }
+        $header = "HTTP/1.1 200 OK`r`nContent-Type: $contentType`r`nContent-Length: $($bytes.Length)`r`n${cacheHeader}Connection: close`r`n`r`n"
       } else {
         $bytes = [Text.Encoding]::UTF8.GetBytes('Not found')
         $header = "HTTP/1.1 404 Not Found`r`nContent-Type: text/plain; charset=utf-8`r`nContent-Length: $($bytes.Length)`r`nConnection: close`r`n`r`n"

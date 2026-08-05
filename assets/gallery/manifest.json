@@ -1,10 +1,52 @@
 [
-  { "slug": "sunday-services", "name": "Sunday Services", "images": [] },
-  { "slug": "vbs", "name": "Vacation Bible School", "images": [] },
-  { "slug": "prayer-night", "name": "Prayer Night", "images": [] },
-  { "slug": "christmas", "name": "Christmas", "images": [] },
-  { "slug": "easter", "name": "Easter", "images": [] },
-  { "slug": "youth", "name": "Youth", "images": [] },
-  { "slug": "womens-ministry", "name": "Women’s Ministry", "images": [] },
-  { "slug": "community-outreach", "name": "Community Outreach", "images": [] }
+  {
+    "slug": "admin-publishing-test",
+    "name": "Admin Publishing Test",
+    "images": [
+      "assets/gallery/admin-publishing-test/admin-publishing-test.png"
+    ]
+  },
+  {
+    "slug": "christmas",
+    "name": "Christmas",
+    "images": [
+      "assets/gallery/christmas/Esther%20Diag.jpg",
+      "assets/gallery/christmas/lOGO.png"
+    ]
+  },
+  {
+    "slug": "community-outreach",
+    "name": "Community Outreach",
+    "images": []
+  },
+  {
+    "slug": "easter",
+    "name": "Easter",
+    "images": []
+  },
+  {
+    "slug": "prayer-night",
+    "name": "Prayer Night",
+    "images": []
+  },
+  {
+    "slug": "sunday-services",
+    "name": "Sunday Services",
+    "images": []
+  },
+  {
+    "slug": "vbs",
+    "name": "Vacation Bible School",
+    "images": []
+  },
+  {
+    "slug": "womens-ministry",
+    "name": "Women’s Ministry",
+    "images": []
+  },
+  {
+    "slug": "youth",
+    "name": "Youth",
+    "images": []
+  }
 ]

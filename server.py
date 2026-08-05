@@ -1,6 +1,7 @@
 ﻿from http.server import SimpleHTTPRequestHandler, HTTPServer
 import json
 import os
+from socketserver import ThreadingMixIn
 from datetime import datetime, timedelta, timezone
 from urllib.request import Request, urlopen
 from xml.etree import ElementTree
@@ -8,6 +9,18 @@ UPCOMING_DIR = 'assets/upcoming'
 GALLERY_DIR = 'assets/gallery'
 YOUTUBE_FEED_URL = 'https://www.youtube.com/feeds/videos.xml?channel_id=UCNPyD_nYVLhC5-47771aGdw'
 class Handler(SimpleHTTPRequestHandler):
+    def end_headers(self):
+        request_path = self.path.split('?', 1)[0]
+        if request_path in {
+            '/api/upcoming-events',
+            '/assets/upcoming/events.json',
+            '/assets/upcoming/manifest.json'
+        }:
+            self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
+        super().end_headers()
+
     def do_GET(self):
         if self.path == '/api/gallery':
             manifest_path = os.path.join(GALLERY_DIR, 'manifest.json')
@@ -99,9 +112,13 @@ class Handler(SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps(files).encode('utf-8'))
             return
         super().do_GET()
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    daemon_threads = True
+
+
 if __name__ == '__main__':
     port = 8000
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    server = HTTPServer(('0.0.0.0', port), Handler)
+    server = ThreadedHTTPServer(('0.0.0.0', port), Handler)
     print(f'Serving on http://localhost:{port}')
     server.serve_forever()

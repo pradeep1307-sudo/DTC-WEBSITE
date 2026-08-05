@@ -3,6 +3,41 @@ const state = { project: null, galleryDir: null, upcomingDir: null, albums: [], 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const statusNode = $('[data-admin-status]');
+const projectButton = $('[data-select-project]');
+const adminDatabaseName = 'dtc-media-manager';
+const adminStoreName = 'settings';
+
+const openAdminDatabase = () => new Promise((resolve, reject) => {
+  const request = indexedDB.open(adminDatabaseName, 1);
+  request.onupgradeneeded = () => request.result.createObjectStore(adminStoreName);
+  request.onsuccess = () => resolve(request.result);
+  request.onerror = () => reject(request.error);
+});
+const readSavedProject = async () => {
+  try {
+    const database = await openAdminDatabase();
+    return await new Promise((resolve, reject) => {
+      const request = database.transaction(adminStoreName).objectStore(adminStoreName).get('project');
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => reject(request.error);
+    });
+  } catch { return null; }
+};
+const saveProject = async (project) => {
+  try {
+    const database = await openAdminDatabase();
+    await new Promise((resolve, reject) => {
+      const request = database.transaction(adminStoreName, 'readwrite').objectStore(adminStoreName).put(project, 'project');
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  } catch { /* The admin still works for this session if storage is unavailable. */ }
+};
+const hasProjectPermission = async (project, requestAccess = false) => {
+  const options = { mode: 'readwrite' };
+  if (await project.queryPermission(options) === 'granted') return true;
+  return requestAccess && await project.requestPermission(options) === 'granted';
+};
 
 const setStatus = (message, detail = '', type = '') => {
   statusNode.className = `admin-status${type ? ` is-${type}` : ''}`;
@@ -53,6 +88,37 @@ const copyFiles = async (directory, files) => {
 const clearObjectUrls = () => { state.objectUrls.forEach(URL.revokeObjectURL); state.objectUrls = []; };
 const previewUrl = async (handle) => { const url = URL.createObjectURL(await handle.getFile()); state.objectUrls.push(url); return url; };
 const formatBytes = (bytes) => bytes < 1048576 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1048576).toFixed(1)} MB`;
+const publishedImage = (path) => ({
+  name: decodeURIComponent(path).split('/').pop(),
+  url: new URL(`../${path}`, window.location.href).href,
+  readOnly: true
+});
+
+const loadPublishedMedia = async () => {
+  try {
+    const cacheKey = Date.now();
+    const [galleryResponse, eventResponse] = await Promise.all([
+      fetch(`../assets/gallery/manifest.json?v=${cacheKey}`, { cache: 'no-store' }),
+      fetch(`../assets/upcoming/manifest.json?v=${cacheKey}`, { cache: 'no-store' })
+    ]);
+    if (!galleryResponse.ok || !eventResponse.ok) throw new Error('Media manifests are unavailable');
+    const [galleryManifest, eventManifest] = await Promise.all([galleryResponse.json(), eventResponse.json()]);
+    if (state.project) return;
+    state.albums = Array.isArray(galleryManifest) ? galleryManifest.map((album) => ({
+      slug: album.slug,
+      name: album.name || displayName(album.slug),
+      images: Array.isArray(album.images) ? album.images.map(publishedImage) : [],
+      readOnly: true
+    })) : [];
+    state.eventImages = Array.isArray(eventManifest) ? eventManifest.map(publishedImage) : [];
+    state.activeAlbum = state.albums[0] || null;
+    renderAlbums();
+    await Promise.all([renderGallery(), renderEvents()]);
+    setStatus('Existing media loaded', 'Select the project folder when you are ready to make changes.', 'ready');
+  } catch (error) {
+    setStatus('Preview could not be loaded', 'Select the project folder to load and manage local media.', 'error');
+  }
+};
 
 const saveGalleryManifest = async () => {
   const manifest = state.albums.map((album) => ({ slug: album.slug, name: album.name, images: album.images.map((image) => encodePath('assets', 'gallery', album.slug, image.name)) }));
@@ -85,6 +151,32 @@ const loadMedia = async () => {
   renderAlbums(); renderGallery(); renderEvents();
 };
 
+const connectProject = async (project, remember = true) => {
+  await project.getFileHandle('index.html');
+  await project.getDirectoryHandle('assets');
+  state.project = project;
+  if (remember) await saveProject(project);
+  await loadMedia();
+  projectButton.textContent = 'Project Connected';
+  setStatus('Project connected', `${project.name} · direct publishing is ready`, 'ready');
+};
+
+const restoreSavedProject = async () => {
+  if (!window.showDirectoryPicker || !window.indexedDB) return;
+  const project = await readSavedProject();
+  if (!project) return;
+  try {
+    if (await hasProjectPermission(project)) {
+      await connectProject(project, false);
+    } else {
+      projectButton.textContent = 'Reconnect Project Folder';
+      setStatus('Project folder remembered', 'Select Reconnect once to restore write access.', 'ready');
+    }
+  } catch {
+    projectButton.textContent = 'Select Project Folder';
+  }
+};
+
 const renderAlbums = () => {
   $('[data-album-total]').textContent = state.albums.length;
   const list = $('[data-album-list]');
@@ -96,23 +188,28 @@ const emptyState = (title, copy, icon = '▧') => `<div class="admin-empty-state
 const createPhotoCard = async (image, index, total, context) => {
   const template = $('#admin-photo-template').content.cloneNode(true);
   const card = $('.admin-photo', template);
-  const file = await image.getFile();
-  $('img', card).src = await previewUrl(image);
+  const file = image.readOnly ? null : await image.getFile();
+  $('img', card).src = image.readOnly ? image.url : await previewUrl(image);
   $('img', card).alt = `${context === 'gallery' ? 'Gallery photo' : 'Event poster'} preview: ${image.name}`;
   $('.admin-photo-info strong', card).textContent = image.name;
-  $('.admin-photo-info small', card).textContent = `${formatBytes(file.size)} · ${index + 1} of ${total}`;
+  $('.admin-photo-info small', card).textContent = `${file ? `${formatBytes(file.size)} · ` : ''}${index + 1} of ${total}${image.readOnly ? ' · Preview' : ''}`;
   if (index === 0) card.classList.add('is-cover');
-  $('[data-action="cover"]', card).hidden = index === 0;
-  $('[data-action="up"]', card).disabled = index === 0;
-  $('[data-action="down"]', card).disabled = index === total - 1;
-  $$('[data-action]', card).forEach((button) => button.addEventListener('click', () => handlePhotoAction(context, image, button.dataset.action)));
+  const actions = $('.admin-photo-actions', card);
+  actions.hidden = image.readOnly;
+  if (!image.readOnly) {
+    $('[data-action="cover"]', card).hidden = index === 0;
+    $('[data-action="up"]', card).disabled = index === 0;
+    $('[data-action="down"]', card).disabled = index === total - 1;
+    $$('[data-action]', card).forEach((button) => button.addEventListener('click', () => handlePhotoAction(context, image, button.dataset.action)));
+  }
   return card;
 };
 const renderGallery = async () => {
   const grid = $('[data-gallery-grid]');
   const upload = $('[data-gallery-upload]');
-  upload.disabled = !state.activeAlbum;
-  upload.closest('.admin-upload').classList.toggle('is-disabled', !state.activeAlbum);
+  const canEditAlbum = Boolean(state.project && state.activeAlbum);
+  upload.disabled = !canEditAlbum;
+  upload.closest('.admin-upload').classList.toggle('is-disabled', !canEditAlbum);
   $('[data-selected-album]').textContent = state.activeAlbum?.name || 'No album selected';
   $('[data-selected-summary]').textContent = state.activeAlbum ? `${state.activeAlbum.images.length} photo${state.activeAlbum.images.length === 1 ? '' : 's'} · first image is the cover` : 'Choose an album from the left.';
   if (!state.activeAlbum) { grid.innerHTML = emptyState('Your album photos will appear here.', 'Choose or create an album, then add JPG, PNG, or WebP photos.'); return; }
@@ -146,14 +243,15 @@ const handlePhotoAction = async (context, image, action) => {
   setStatus('Changes saved locally', 'Review the public page before committing and pushing.', 'ready');
 };
 
-$('[data-select-project]').addEventListener('click', async () => {
+projectButton.addEventListener('click', async () => {
   if (!window.showDirectoryPicker) { setStatus('Browser not supported', 'Open this page in Microsoft Edge or Google Chrome.', 'error'); return; }
   try {
-    const project = await window.showDirectoryPicker({ id: 'dtc-project', mode: 'readwrite' });
-    await project.getFileHandle('index.html'); await project.getDirectoryHandle('assets');
-    state.project = project;
-    await loadMedia();
-    setStatus('Project connected', `${project.name} · manifests synchronized`, 'ready');
+    const rememberedProject = await readSavedProject();
+    const project = rememberedProject && await hasProjectPermission(rememberedProject, true)
+      ? rememberedProject
+      : await window.showDirectoryPicker({ id: 'dtc-project', mode: 'readwrite' });
+    await connectProject(project);
+    navigator.storage?.persist?.().catch(() => {});
   } catch (error) { if (error.name !== 'AbortError') setStatus('Could not open that folder', 'Choose the DTC App project folder containing index.html.', 'error'); }
 });
 $('[data-create-album]').addEventListener('submit', async (event) => {
@@ -169,3 +267,4 @@ $('[data-gallery-upload]').addEventListener('change', async (event) => { if (!st
 $('[data-event-upload]').addEventListener('change', async (event) => { if (!state.upcomingDir || !event.target.files.length) return; setStatus('Adding posters…', 'Please keep this page open.'); await copyFiles(state.upcomingDir, event.target.files); event.target.value=''; await loadMedia(); setStatus('Posters added', 'Upcoming Events manifest updated automatically.', 'ready'); });
 $$('[data-admin-tab]').forEach((tab) => tab.addEventListener('click', () => { $$('[data-admin-tab]').forEach((item) => item.setAttribute('aria-selected', String(item === tab))); $$('[data-admin-panel]').forEach((panel) => { panel.hidden = panel.dataset.adminPanel !== tab.dataset.adminTab; }); }));
 window.addEventListener('beforeunload', clearObjectUrls);
+loadPublishedMedia().finally(restoreSavedProject);
