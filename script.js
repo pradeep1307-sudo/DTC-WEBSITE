@@ -901,13 +901,16 @@ const initChurchChat = () => {
           <div class="church-chat-suggestions" aria-label="Suggested questions">
             <button type="button" data-chat-question="What time is Sunday service?">Service times</button>
             <button type="button" data-chat-question="What do you believe?">Our beliefs</button>
+            <button type="button" data-chat-question="What ministries do you have?">Ministries</button>
+            <button type="button" data-chat-question="What events are coming up?">Upcoming events</button>
             <button type="button" data-chat-question="Where is the church?">Plan a visit</button>
             <button type="button" data-chat-question="How can I watch online?">Watch online</button>
+            <button type="button" data-chat-question="How can I give?">Giving options</button>
             <button type="button" data-chat-connect>Connect with us</button>
           </div>
         </div>
         <div class="church-chat-window">
-          <div class="church-chat-header"><span class="church-chat-avatar" aria-hidden="true"><img src="assets/lOGO.png" alt="" width="142" height="94" /></span><div><strong>Denver Tamil Church Assistant</strong><span><i aria-hidden="true"></i> Ready to help</span></div></div>
+          <div class="church-chat-header"><span class="church-chat-avatar" aria-hidden="true"><img src="assets/lOGO.png" alt="" width="142" height="94" /></span><div><strong>Denver Tamil Church Assistant</strong><span><i aria-hidden="true"></i> Site knowledge ready</span></div></div>
           <div class="church-chat-messages" role="log" aria-live="polite" aria-relevant="additions"><div class="church-chat-message is-bot">Welcome! Ask me a question about Denver Tamil Church or anything published on this website.</div></div>
           <form class="church-chat-form"><label class="sr-only" for="church-chat-input">Ask the church website assistant</label><input id="church-chat-input" type="text" placeholder="Type your question…" autocomplete="off" maxlength="240" required /><button type="submit" aria-label="Send question">Send</button></form>
           <p class="church-chat-disclaimer">Runs locally using this website’s content—no AI API or tokens. For personal or urgent requests, please contact the church directly.</p>
@@ -951,23 +954,41 @@ const initChurchChat = () => {
     if (event.key === 'Escape' && chat.classList.contains('is-open')) setChatOpen(false);
   });
   const knowledge = [
-    { words: ['time', 'service', 'sunday', 'worship', 'communion', 'fasting', 'promise service', 'women bible', 'zoom'], answer: 'Sunday worship begins at 4:30 PM Mountain Time, and Prayer & Bible Study meets every Friday at 6:30 PM. Monthly gatherings include Communion on the first Sunday, Teen and Adult Service on the third Sunday, Fasting and Prayer on the first Saturday, Women’s Bible Study via Zoom on the first and third Thursdays, and God’s Promise Service at 6:00 AM on the first day.', link: ['View all service dates', 'events.html#event-calendar'] },
-    { words: ['christmas', 'easter', 'holy week', 'palm sunday', 'maundy', 'good friday', 'holy saturday', 'ascension', 'pentecost', 'advent'], answer: 'The church calendar includes Palm Sunday, Holy Week, Easter, Ascension Day, Pentecost, Advent, Christmas Eve, and Christmas Day. Select an observance in the calendar for its date and complete details.', link: ['View Christian observances', 'events.html#event-calendar'] },
-    { words: ['holiday', 'new year', 'martin luther king', 'presidents day', 'memorial day', 'juneteenth', 'independence day', 'labor day', 'columbus day', 'veterans day', 'thanksgiving'], answer: 'The calendar identifies major U.S. holidays separately from church events and Christian observances. Use the color legend to distinguish each category.', link: ['View the church calendar', 'events.html#event-calendar'] },
-    { words: ['friday', 'prayer and bible', 'prayer bible', '6:30'], answer: 'Prayer & Bible Study meets every Friday at 6:30 PM at 9052 W Ken Caryl Ave, Littleton, CO 80128.', link: ['View the event calendar', 'events.html#event-calendar'] },
-    { words: ['ministry', 'ministries', 'kids ministry', 'children ministry', 'teen ministry', 'youth ministry', 'young adult', 'mens ministry', "men's ministry", 'womens ministry', "women's ministry"], answer: 'Denver Tamil Church offers Kids, Teen & Young Adult, Men’s, and Women’s ministries where every generation can grow in Christ, connect, pray, study Scripture, and serve.', link: ['Explore ministries', 'ministry.html'] },
-    { words: ['time', 'service', 'sunday', 'worship', 'when', 'communion', 'fasting', 'promise', 'women', 'bible', 'zoom', 'நேரம்', 'ஆராதனை'], answer: 'Sunday worship begins at 4:30 PM Mountain Time. Monthly gatherings include Communion on the first Sunday, Teen and Adult Service on the third Sunday, Fasting and Prayer on the first Saturday, Women’s Bible Study via Zoom on the first and third Thursdays, and God’s Promise Service at 6:00 AM on the first day.', link: ['View the event calendar', 'events.html'] },
-    { words: ['address', 'location', 'where', 'visit', 'direction', 'parking', 'முகவரி', 'இடம்'], answer: 'Denver Tamil Church meets at 9052 W Ken Caryl Ave, Littleton, CO 80128.', link: ['Get directions', 'https://www.google.com/maps/search/?api=1&query=9052+W+Ken+Caryl+Ave%2C+Littleton%2C+CO+80128'] },
-    { words: ['believe', 'belief', 'faith', 'doctrine', 'god', 'jesus', 'gospel', 'நம்பிக்கை', 'இயேசு'], answer: 'We believe in one God and Father, revealed through Jesus Christ in redemption and through the Holy Spirit working in grace. Our teaching is rooted in Scripture, prayer, heartfelt worship, holy living, and faithful discipleship.', link: ['Read about our faith', 'index.html#home-beliefs'] },
-    { words: ['pastor', 'jude', 'leader', 'போதகர்'], answer: 'Pastor Jude Francis is a pastor, teacher, and marketplace minister who equips believers to live as authentic disciples of Christ. He is married to Merina Francis, and they have two daughters.', link: ['Meet our pastor', 'index.html'] },
-    { words: ['mission', 'outreach', 'homeless', 'discipleship', 'ministry', 'serve', 'ஊழியம்'], answer: 'Our ministries include local Denver outreach, global missions support in India, and discipleship ministries for adults, women, youth, and young adults.', link: ['Explore missions', 'missions.html'] },
-    { words: ['live', 'stream', 'youtube', 'online', 'video', 'watch', 'நேரலை'], answer: 'You can watch Sunday worship and browse recent services on the Live Stream page.', link: ['Open Live Stream', 'live.html'] },
-    { words: ['event', 'upcoming', 'calendar', 'vbs', 'picnic', 'நிகழ்வு'], answer: 'The Upcoming Events page includes a month calendar, event posters, dates, locations, and complete event details.', link: ['See upcoming events', 'events.html'] },
-    { words: ['give', 'giving', 'donate', 'offering', 'tithe', 'கொடை'], answer: 'The Give page explains the available ways to support Denver Tamil Church and its ministries.', link: ['View giving options', 'give.html'] },
-    { words: ['gallery', 'photo', 'album', 'picture', 'புகைப்படம்'], answer: 'The Gallery contains church event albums. Select an album to browse all of its available photos.', link: ['Open Gallery', 'gallery.html'] },
-    { words: ['prayer', 'request', 'pray', 'ஜெபம்'], answer: 'We would be honored to pray with you. Choose “Prayer Request” in the contact form above, or email the church directly.', link: ['Email a prayer request', 'mailto:info@denvertamilchurch.com'] },
-    { words: ['phone', 'call', 'contact', 'email', 'reach', 'தொடர்பு'], answer: 'Call Denver Tamil Church at (720) 819-5990 or email info@denvertamilchurch.com. You can also use the contact form above.', link: ['Email the church', 'mailto:info@denvertamilchurch.com'] },
-    { words: ['tamil', 'language', 'english', 'தமிழ்'], answer: 'The primary Sunday gathering is a Tamil service with Kids Sunday School. An English service is held every third Sunday. This website can also be switched between English and Tamil using the language control.' }
+    { phrases: ['hello', 'hi', 'good morning', 'good evening', 'vanakkam', 'வணக்கம்'], priority: 2, answer: 'Welcome to Denver Tamil Church! I can help with service times, directions, beliefs, ministries, events, livestreams, giving, prayer requests, and contact information. What would you like to know?' },
+    { phrases: ['thank you', 'thanks', 'நன்றி'], priority: 2, answer: 'You’re welcome! Please ask if you would like help with anything else about Denver Tamil Church.' },
+    { phrases: ['emergency', 'urgent help', 'suicide', 'danger'], priority: 12, answer: 'I’m sorry you are facing an urgent situation. This website assistant cannot provide emergency help. If anyone is in immediate danger in the United States, call 911. You may also call Denver Tamil Church at (720) 819-5990 for church contact.', link: ['Call the church', 'tel:+17208195990'] },
+    { phrases: ['kids ministry', 'children ministry', 'child ministry', 'sunday school', 'vbs', 'vacation bible school'], priority: 10, answer: 'Kids Ministry meets every Sunday at 5:00 PM during the worship service. Children receive age-appropriate Bible lessons, prayer, worship, activities, and fellowship. The ministry also holds annual Vacation Bible School and approximately six children’s presentations each year.', link: ['Explore Kids Ministry', 'ministry.html#ministries'] },
+    { phrases: ['teen ministry', 'young adult ministry', 'youth ministry', 'teen and adult'], priority: 9, answer: 'Teen & Young Adult Ministry offers Bible teaching, worship, prayer, fellowship, mentoring, leadership development, service, and healthy Christian friendships. Confirmed gathering dates are posted when available; please contact the church for the next gathering.', link: ['Connect with Teen & Young Adult Ministry', 'contact.html?subject=Teen%20%26%20Young%20Adult%20Ministry#contact-form'] },
+    { phrases: ["men's ministry", 'mens ministry', 'men ministry'], priority: 9, answer: 'Men’s Ministry helps men grow through prayer, Bible study, fellowship, mentoring, service, and family-focused activities. Please contact the church for the next confirmed gathering.', link: ['Connect with Men’s Ministry', 'contact.html?subject=Men%27s%20Ministry#contact-form'] },
+    { phrases: ["women's ministry", 'womens ministry', 'women ministry'], priority: 9, answer: 'Women’s Ministry is a caring community for prayer, Bible study, discipleship, encouragement, friendship, outreach, and seasonal gatherings. Please contact the church for the next confirmed gathering.', link: ['Connect with Women’s Ministry', 'contact.html?subject=Women%27s%20Ministry#contact-form'] },
+    { phrases: ["women's bible study", 'women bible study', 'bible study zoom', 'zoom bible study'], priority: 11, answer: 'Women’s Bible Study meets online through Zoom on the first and third Thursday of each month. Contact the church for the current Zoom access details.', link: ['Request Zoom details', 'contact.html?subject=Women%27s%20Ministry#contact-form'] },
+    { phrases: ['what ministries', 'church ministries', 'available ministries', 'ministries'], priority: 5, answer: 'Denver Tamil Church offers Kids, Teen & Young Adult, Men’s, and Women’s ministries. The church also serves through Local Mission, Global Missions, and Discipleship Ministries.', link: ['Explore all ministries', 'ministry.html'] },
+    { phrases: ['friday prayer', 'prayer and bible study', 'prayer bible study', 'friday bible study', '6 30'], priority: 10, answer: 'Prayer & Bible Study meets every Friday at 6:30 PM at 9052 W Ken Caryl Ave, Littleton, CO 80128.', link: ['View the event calendar', 'events.html#event-calendar'] },
+    { phrases: ['communion service', 'first sunday communion'], priority: 10, answer: 'Communion Service is held on the first Sunday of each month as part of Sunday worship at 4:30 PM Mountain Time.', link: ['View Communion dates', 'events.html#event-calendar'] },
+    { phrases: ['fasting prayer', 'fasting and prayer'], priority: 10, answer: 'Fasting and Prayer Service is held on the first Saturday of each month. Contact the church for the confirmed service time.', link: ['Ask about Fasting & Prayer', 'contact.html?subject=Prayer%20Request#contact-form'] },
+    { phrases: ["god's promise service", 'gods promise service', 'promise service'], priority: 10, answer: 'God’s Promise Service is held at 6:00 AM on the first day of every month, with Scripture, worship, and prayer for the month ahead.', link: ['View the church calendar', 'events.html#event-calendar'] },
+    { phrases: ['sunday service', 'service time', 'worship time', 'what time', 'when is service', 'ஞாயிறு', 'ஆராதனை', 'நேரம்'], priority: 7, answer: 'Sunday worship begins at 4:30 PM Mountain Time. The primary gathering is a Tamil service with Kids Sunday School. Communion is on the first Sunday, and Teen & Adult Sunday Service is on the third Sunday.', link: ['Plan your visit', 'contact.html'] },
+    { phrases: ['christmas', 'easter', 'holy week', 'palm sunday', 'maundy thursday', 'good friday', 'holy saturday', 'ascension', 'pentecost', 'advent'], priority: 6, answer: 'The church calendar includes Palm Sunday, Holy Week, Easter, Ascension Day, Pentecost, Advent, Christmas Eve, and Christmas Day. Select an observance in the calendar for its date and complete details.', link: ['View Christian observances', 'events.html#event-calendar'] },
+    { phrases: ['us holiday', 'federal holiday', 'memorial day', 'juneteenth', 'independence day', 'labor day', 'veterans day', 'thanksgiving'], priority: 6, answer: 'The calendar identifies major U.S. holidays separately from church events and Christian observances. Use the color legend to distinguish each category.', link: ['View the church calendar', 'events.html#event-calendar'] },
+    { phrases: ['address', 'location', 'where is the church', 'directions', 'visit church', 'முகவரி', 'இடம்'], priority: 8, answer: 'Denver Tamil Church meets at 9052 W Ken Caryl Ave, Littleton, CO 80128. The website does not publish specific parking instructions; contact the church if you need accessibility or arrival assistance.', link: ['Get directions', 'https://www.google.com/maps/search/?api=1&query=9052+W+Ken+Caryl+Ave%2C+Littleton%2C+CO+80128'] },
+    { phrases: ['park', 'parking', 'accessible parking', 'wheelchair'], priority: 9, answer: 'Specific parking and accessibility details are not currently published on the website. Please call (720) 819-5990 or contact the church before your visit so someone can assist you.', link: ['Contact the church', 'contact.html#contact-form'] },
+    { phrases: ['what do you believe', 'beliefs', 'doctrine', 'statement of faith', 'நம்பிக்கை'], priority: 9, answer: 'Denver Tamil Church’s faith is rooted in Scripture and the New Testament church. We believe in one God and Father, redemption through Jesus Christ, and the work of the Holy Spirit in grace, prayer, worship, holy living, and faithful discipleship.', link: ['Read What We Believe', 'index.html#home-beliefs'] },
+    { phrases: ['pastor', 'jude francis', 'church leader', 'போதகர்'], priority: 9, answer: 'Pastor Jude Francis is a pastor, teacher, and marketplace minister who equips believers to live as authentic disciples of Christ. He is married to Merina Francis, and they have two daughters.', link: ['Meet our pastor', 'index.html'] },
+    { phrases: ['local mission', 'homeless outreach', 'food assistance'], priority: 9, answer: 'Local Mission serves the Denver metro area through food assistance, prayer support, community events, practical care for families, and sharing the Gospel.', link: ['Explore Local Mission', 'missions.html'] },
+    { phrases: ['global mission', 'missionaries', 'india mission'], priority: 9, answer: 'Global Missions partners with missionaries and ministries in India through church building, education initiatives, disaster relief, and sharing the Good News of Jesus Christ.', link: ['Explore Global Missions', 'missions.html'] },
+    { phrases: ['discipleship ministry', 'disciple maker'], priority: 9, answer: 'Discipleship Ministries equips adults, women, youth, and young adults through Bible studies, prayer groups, spiritual guidance, and opportunities to grow as disciple-makers.', link: ['Explore Discipleship', 'missions.html'] },
+    { phrases: ['mission', 'missions', 'outreach', 'serve community', 'ஊழியம்'], priority: 5, answer: 'Denver Tamil Church serves through local Denver outreach, global mission partnerships in India, and discipleship ministries for adults, women, youth, and young adults.', link: ['Explore missions', 'missions.html'] },
+    { phrases: ['live stream', 'livestream', 'watch online', 'youtube', 'previous service', 'recent service', 'நேரலை'], priority: 8, answer: 'Watch the current or latest Sunday worship service on the Live Stream page. That page also provides recent services from the last two months and a direct link to the Denver Tamil Church YouTube channel.', link: ['Open Live Stream', 'live.html'] },
+    { phrases: ['zelle', 'dtcact'], priority: 11, answer: 'The Give page lists the verified Zelle email as DTCACT@GMAIL.COM. Please confirm the recipient details carefully before sending.', link: ['Review Zelle giving', 'give.html'] },
+    { phrases: ['churchtrac', 'online giving', 'give online', 'digital wallet'], priority: 10, answer: 'Online giving is available securely through the church’s ChurchTrac giving page. The Give page also explains digital-wallet, Zelle, and mail options.', link: ['Give online', 'give.html'] },
+    { phrases: ['mail a check', 'give by mail', 'check payable', 'mail donation'], priority: 10, answer: 'Make checks payable to Denver Tamil Church and mail them to 9052 W Ken Caryl Ave, Littleton, CO 80128.', link: ['Review giving by mail', 'give.html'] },
+    { phrases: ['give', 'giving', 'donate', 'offering', 'tithe', '501 c 3', 'tax deductible', 'கொடை'], priority: 6, answer: 'You can support Denver Tamil Church through ChurchTrac online giving, a digital wallet, Zelle, or a mailed check. The church is a qualified 501(c)(3) organization; tax treatment depends on applicable law.', link: ['View giving options', 'give.html'] },
+    { phrases: ['event', 'upcoming event', 'calendar', 'what is happening', 'நிகழ்வு'], priority: 4, answer: 'The Upcoming Events page includes church gatherings, recurring services, Christian observances, U.S. holidays, event posters, dates, locations, and complete event details.', link: ['See upcoming events', 'events.html'] },
+    { phrases: ['gallery', 'photo', 'album', 'pictures', 'புகைப்படம்'], priority: 5, answer: 'The Gallery organizes church photos into event albums. Select an album to browse its available images using the viewer and navigation controls.', link: ['Open Gallery', 'gallery.html'] },
+    { phrases: ['prayer request', 'pray for me', 'need prayer', 'ஜெபம்'], priority: 9, answer: 'We would be honored to pray with you. Choose “Prayer Request” in the contact form or email info@denvertamilchurch.com. For an urgent emergency, contact local emergency services; the website assistant cannot provide emergency help.', link: ['Send a prayer request', 'contact.html?subject=Prayer%20Request#contact-form'] },
+    { phrases: ['phone number', 'call church', 'email address', 'contact information', 'reach church', 'தொடர்பு'], priority: 8, answer: 'Call Denver Tamil Church at (720) 819-5990 or email info@denvertamilchurch.com. You can also use the website contact form for general questions, ministry interest, prayer requests, pastoral contact, or visits.', link: ['Open the contact form', 'contact.html#contact-form'] },
+    { phrases: ['tamil service', 'english service', 'language', 'தமிழ்'], priority: 8, answer: 'The primary Sunday gathering is a Tamil service with Kids Sunday School. Teen & Adult Sunday Service is held every third Sunday. The website can be switched between English and Tamil using the EN/TA control.' },
+    { phrases: ['denomination', 'non denominational', 'independent church'], priority: 9, answer: 'Denver Tamil Church is an independent, non-denominational Christian community established in 2004 and rooted in the teachings of Jesus, the Apostles, and the New Testament church.', link: ['Learn who we are', 'index.html'] }
   ];
   const websitePages = [
     ['Who We Are', 'index.html'],
@@ -979,36 +1000,59 @@ const initChurchChat = () => {
     ['Contact', 'contact.html'],
     ['Gallery', 'gallery.html']
   ];
-  const stopWords = new Set(['about', 'after', 'also', 'and', 'are', 'can', 'for', 'from', 'have', 'how', 'our', 'that', 'the', 'this', 'what', 'when', 'where', 'which', 'with', 'you', 'your']);
-  const tokenize = (value) => [...new Set(value.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) || [])]
+  const stopWords = new Set(['about', 'after', 'also', 'and', 'are', 'can', 'does', 'for', 'from', 'have', 'how', 'our', 'that', 'the', 'this', 'what', 'when', 'where', 'which', 'with', 'you', 'your']);
+  const normalizeSearch = (value) => value.toLocaleLowerCase().normalize('NFKD').replace(/[’']/g, '').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const tokenize = (value) => [...new Set(normalizeSearch(value).match(/[\p{L}\p{N}]+/gu) || [])]
     .filter((word) => word.length > 2 && !stopWords.has(word));
+  const concise = (value, limit = 520) => {
+    const clean = value.replace(/\s+/g, ' ').trim();
+    if (clean.length <= limit) return clean;
+    const shortened = clean.slice(0, limit);
+    const sentence = Math.max(shortened.lastIndexOf('. '), shortened.lastIndexOf('! '), shortened.lastIndexOf('? '));
+    return `${shortened.slice(0, sentence > limit * .55 ? sentence + 1 : shortened.lastIndexOf(' '))}…`;
+  };
   const websiteIndexPromise = Promise.all(websitePages.map(async ([title, href]) => {
     try {
       const response = await fetch(href, { cache: 'no-store' });
       if (!response.ok) return [];
       const documentCopy = new DOMParser().parseFromString(await response.text(), 'text/html');
       documentCopy.querySelectorAll('script, style, nav, footer, [data-lang="ta"]').forEach((node) => node.remove());
-      return [...documentCopy.querySelectorAll('main h1, main h2, main h3, main p, main li, main figcaption, main dt, main dd, main label, main option, main time')]
-        .map((node) => node.textContent.replace(/\s+/g, ' ').trim())
-        .filter((text) => text.length >= 18)
-        .map((text) => ({ title, href, text, tokens: tokenize(text) }));
+      const main = documentCopy.querySelector('main');
+      if (!main) return [];
+      const blocks = [...main.querySelectorAll('section, article, dialog')].filter((node) => !node.querySelector(':scope > section, :scope > article, :scope > dialog'));
+      const entries = blocks.map((node) => {
+        const heading = node.querySelector('h1, h2, h3')?.textContent.replace(/\s+/g, ' ').trim();
+        const text = [...node.querySelectorAll('h1, h2, h3, p, li, figcaption, dt, dd, label, option, time')]
+          .map((item) => item.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean).join('. ');
+        return { title: heading ? `${title} — ${heading}` : title, href, text: concise(text), tokens: tokenize(`${heading || ''} ${text}`) };
+      }).filter((entry) => entry.text.length >= 18);
+      const fullText = [...main.querySelectorAll('h1, h2, h3, p, li, figcaption, dt, dd, label, option, time')]
+        .map((node) => node.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean).join('. ');
+      entries.push({ title, href, text: concise(fullText), tokens: tokenize(fullText) });
+      return entries;
     } catch (error) {
       return [];
     }
   })).then((groups) => groups.flat());
-  const eventIndexPromise = fetch('assets/upcoming/events.json', { cache: 'no-store' })
-    .then((response) => response.ok ? response.json() : [])
+  const eventsDataPromise = fetch('assets/upcoming/events.json', { cache: 'no-store' })
+    .then((response) => response.ok ? response.json() : []).catch(() => []);
+  const eventIndexPromise = eventsDataPromise
     .then((events) => events.map((event) => {
       const text = [event.title, event.dateLabel, event.time, event.location, event.summary, ...(event.details || [])]
         .filter(Boolean).join('. ');
       return {
         title: 'Upcoming Events',
         href: `event-details.html?id=${encodeURIComponent(event.id)}`,
-        text,
+        text: concise(text),
         tokens: tokenize(text)
       };
-    }))
-    .catch(() => []);
+    }));
+  const galleryIndexPromise = fetch('assets/gallery/manifest.json', { cache: 'no-store' })
+    .then((response) => response.ok ? response.json() : [])
+    .then((albums) => albums.map((album) => {
+      const text = `${album.name} gallery album with ${album.images?.length || 0} published photo${album.images?.length === 1 ? '' : 's'}.`;
+      return { title: `Gallery — ${album.name}`, href: 'gallery.html', text, tokens: tokenize(`${album.name} gallery photos album`) };
+    })).catch(() => []);
 
   const addMessage = (text, type, link) => {
     const message = document.createElement('div');
@@ -1121,27 +1165,53 @@ const initChurchChat = () => {
   };
 
   const answerQuestion = async (question) => {
-    const normalized = question.toLocaleLowerCase();
-    if (/\b(connect|join|message the church|contact the church)\b/.test(normalized)) {
+    const normalized = normalizeSearch(question);
+    if (/^(connect me|connect with the church|message the church|send a message|contact the church|contact form)$/.test(normalized)) {
       startConnect();
       return;
     }
+    if (/\b(next|upcoming|coming|future)\b.*\b(event|events|happening)\b|\bwhat is happening\b/.test(normalized)) {
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      const upcoming = (await eventsDataPromise)
+        .filter((event) => !event.calendarOnly && event.date && new Date(`${event.date}T12:00:00`) >= startOfToday)
+        .sort((a, b) => a.date.localeCompare(b.date)).slice(0, 3);
+      if (upcoming.length) {
+        const summary = upcoming.map((event) => `${event.title}: ${event.dateLabel}${event.location ? ` at ${event.location}` : ''}`).join(' Next, ');
+        window.setTimeout(() => addMessage(`Here are the next published events. ${summary}.`, 'bot', ['View all upcoming events', 'events.html']), 280);
+        return;
+      }
+    }
+    const rawTokens = new Set(normalized.split(' ').filter(Boolean));
     const ranked = knowledge
-      .map((item) => ({ item, score: item.words.reduce((score, word) => score + (normalized.includes(word) ? 1 : 0), 0) }))
+      .map((item) => {
+        const phraseScore = item.phrases.reduce((score, phrase) => {
+          const normalizedPhrase = normalizeSearch(phrase);
+          const phraseWords = normalizedPhrase.split(' ').filter(Boolean);
+          const matches = phraseWords.length === 1 ? rawTokens.has(normalizedPhrase) : normalized.includes(normalizedPhrase);
+          return score + (matches ? 6 + Math.min(phraseWords.length, 4) * 2 : 0);
+        }, 0);
+        return { item, score: phraseScore + (phraseScore ? (item.priority || 0) / 100 : 0) };
+      })
       .sort((a, b) => b.score - a.score);
     const match = ranked[0];
-    if (match && match.score > 0) {
+    if (match && match.score >= 6) {
       window.setTimeout(() => addMessage(match.item.answer, 'bot', match.item.link), 280);
       return;
     }
     const queryTokens = tokenize(question);
-    const websiteIndex = [...await websiteIndexPromise, ...await eventIndexPromise];
+    const websiteIndex = [...await websiteIndexPromise, ...await eventIndexPromise, ...await galleryIndexPromise];
     const pageMatches = websiteIndex
-      .map((entry) => ({ entry, score: queryTokens.reduce((score, token) => score + (entry.tokens.includes(token) ? 2 : entry.text.toLocaleLowerCase().includes(token) ? 1 : 0), 0) }))
+      .map((entry) => {
+        const entryTitle = normalizeSearch(entry.title);
+        const entryText = normalizeSearch(entry.text);
+        const score = queryTokens.reduce((total, token) => total + (entry.tokens.includes(token) ? 3 : entryText.includes(token) ? 1 : 0) + (entryTitle.includes(token) ? 3 : 0), 0);
+        return { entry, score, coverage: queryTokens.length ? queryTokens.filter((token) => entry.tokens.includes(token)).length / queryTokens.length : 0 };
+      })
       .filter((result) => result.score > 0)
-      .sort((a, b) => b.score - a.score);
+      .sort((a, b) => b.coverage - a.coverage || b.score - a.score);
     window.setTimeout(() => {
-      if (pageMatches.length) {
+      if (pageMatches.length && (pageMatches[0].coverage >= .34 || pageMatches[0].score >= 6)) {
         const best = pageMatches[0].entry;
         addMessage(best.text, 'bot', [`Read more on ${best.title}`, best.href]);
       } else {
