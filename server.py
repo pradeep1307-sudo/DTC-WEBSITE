@@ -4,13 +4,21 @@ import os
 from datetime import datetime, timedelta, timezone
 from urllib.request import Request, urlopen
 from xml.etree import ElementTree
-CONTENT_FILE = 'content.json'
 UPCOMING_DIR = 'assets/upcoming'
 GALLERY_DIR = 'assets/gallery'
 YOUTUBE_FEED_URL = 'https://www.youtube.com/feeds/videos.xml?channel_id=UCNPyD_nYVLhC5-47771aGdw'
 class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/api/gallery':
+            manifest_path = os.path.join(GALLERY_DIR, 'manifest.json')
+            if os.path.isfile(manifest_path):
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.send_header('Cache-Control', 'no-cache')
+                self.end_headers()
+                with open(manifest_path, 'rb') as manifest:
+                    self.wfile.write(manifest.read())
+                return
             extensions = ('.png', '.jpg', '.jpeg', '.webp')
             albums = []
             if os.path.isdir(GALLERY_DIR):
@@ -68,6 +76,15 @@ class Handler(SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({'error': str(error)}).encode('utf-8'))
             return
         if self.path == '/api/upcoming-events':
+            manifest_path = os.path.join(UPCOMING_DIR, 'manifest.json')
+            if os.path.isfile(manifest_path):
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.send_header('Cache-Control', 'no-cache')
+                self.end_headers()
+                with open(manifest_path, 'rb') as manifest:
+                    self.wfile.write(manifest.read())
+                return
             extensions = ('.png', '.jpg', '.jpeg', '.webp')
             files = []
             if os.path.isdir(UPCOMING_DIR):
@@ -81,27 +98,7 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(files).encode('utf-8'))
             return
-        if self.path == '/api/content':
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            with open(CONTENT_FILE, 'rb') as f:
-                self.wfile.write(f.read())
-        else:
-            super().do_GET()
-    def do_POST(self):
-        if self.path == '/api/content':
-            length = int(self.headers.get('Content-Length', 0))
-            body = self.rfile.read(length)
-            data = json.loads(body.decode('utf-8'))
-            with open(CONTENT_FILE, 'w', encoding='utf-8') as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/plain')
-            self.end_headers()
-            self.wfile.write(b'OK')
-        else:
-            self.send_error(404)
+        super().do_GET()
 if __name__ == '__main__':
     port = 8000
     os.chdir(os.path.dirname(os.path.abspath(__file__)))

@@ -34,6 +34,15 @@ try {
 
       if ($requestPath -eq 'api/upcoming-events') {
         $upcomingFolder = Join-Path $root 'assets/upcoming'
+        $upcomingManifest = Join-Path $upcomingFolder 'manifest.json'
+        if (Test-Path -LiteralPath $upcomingManifest -PathType Leaf) {
+          $bytes = [IO.File]::ReadAllBytes($upcomingManifest)
+          $header = "HTTP/1.1 200 OK`r`nContent-Type: application/json; charset=utf-8`r`nContent-Length: $($bytes.Length)`r`nCache-Control: no-cache`r`nConnection: close`r`n`r`n"
+          $headerBytes = [Text.Encoding]::ASCII.GetBytes($header)
+          $stream.Write($headerBytes, 0, $headerBytes.Length)
+          $stream.Write($bytes, 0, $bytes.Length)
+          continue
+        }
         $slides = if (Test-Path -LiteralPath $upcomingFolder -PathType Container) {
           Get-ChildItem -LiteralPath $upcomingFolder -File | Where-Object { $_.Extension -match '^\.(png|jpe?g|webp)$' } | Sort-Object Name | ForEach-Object { "assets/upcoming/$([Uri]::EscapeDataString($_.Name))" }
         } else { @() }
@@ -48,6 +57,15 @@ try {
       }
       if ($requestPath -eq 'api/gallery') {
         $galleryFolder = Join-Path $root 'assets/gallery'
+        $galleryManifest = Join-Path $galleryFolder 'manifest.json'
+        if (Test-Path -LiteralPath $galleryManifest -PathType Leaf) {
+          $bytes = [IO.File]::ReadAllBytes($galleryManifest)
+          $header = "HTTP/1.1 200 OK`r`nContent-Type: application/json; charset=utf-8`r`nContent-Length: $($bytes.Length)`r`nCache-Control: no-cache`r`nConnection: close`r`n`r`n"
+          $headerBytes = [Text.Encoding]::ASCII.GetBytes($header)
+          $stream.Write($headerBytes, 0, $headerBytes.Length)
+          $stream.Write($bytes, 0, $bytes.Length)
+          continue
+        }
         $albumItems = @()
         if (Test-Path -LiteralPath $galleryFolder -PathType Container) {
           $albumItems = @(Get-ChildItem -LiteralPath $galleryFolder -Directory | Sort-Object Name | ForEach-Object {

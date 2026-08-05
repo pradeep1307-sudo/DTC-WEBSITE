@@ -836,6 +836,34 @@ const initSharedContactStrip = () => {
   setLanguage(localStorage.getItem('siteLanguage') || 'en');
 };
 
+const initProfessionalFooter = () => {
+  const footer = document.querySelector('.footer, .page-footer');
+  if (!footer || footer.dataset.enhanced === 'true') return;
+  footer.dataset.enhanced = 'true';
+  footer.classList.add('site-footer');
+  footer.innerHTML = `
+    <div class="site-footer-main">
+      <div class="site-footer-brand">
+        <a href="index.html" aria-label="Denver Tamil Church home"><img src="lOGO.png" alt="Denver Tamil Church logo" width="142" height="94" /></a>
+        <div><h2>Denver Tamil Church</h2><p><span class="lang" data-lang="en">A welcoming Tamil church family rooted in Scripture, prayer, worship, and service.</span><span class="lang" data-lang="ta">வேதாகமம், ஜெபம், ஆராதனை மற்றும் சேவையில் வேரூன்றிய தமிழ் திருச்சபைக் குடும்பம்.</span></p></div>
+      </div>
+      <nav class="site-footer-links" aria-label="Footer navigation">
+        <h3><span class="lang" data-lang="en">Explore</span><span class="lang" data-lang="ta">ஆராயுங்கள்</span></h3>
+        <a href="index.html">Who We Are</a><a href="ministry.html">Ministries</a><a href="events.html">Upcoming Events</a><a href="gallery.html">Gallery</a>
+      </nav>
+      <div class="site-footer-links">
+        <h3><span class="lang" data-lang="en">Connect</span><span class="lang" data-lang="ta">தொடர்பு</span></h3>
+        <a href="live.html">Live Stream</a><a href="contact.html#contact-form">Contact &amp; Prayer</a><a href="give.html">Give</a><a href="tel:+17208195990">(720) 819-5990</a>
+      </div>
+      <div class="site-footer-service">
+        <h3><span class="lang" data-lang="en">Join Us Sunday</span><span class="lang" data-lang="ta">ஞாயிறு வாருங்கள்</span></h3>
+        <strong>4:30 PM</strong><p>9052 W Ken Caryl Ave<br />Littleton, CO 80128</p><a href="https://www.google.com/maps/search/?api=1&amp;query=9052+W+Ken+Caryl+Ave%2C+Littleton%2C+CO+80128" target="_blank" rel="noopener noreferrer">Get Directions →</a>
+      </div>
+    </div>
+    <div class="site-footer-bottom"><p>@2004 DENVER TAMIL CHURCH</p><div><a href="https://www.facebook.com/denver.tamilchurch01/" target="_blank" rel="noopener noreferrer">Facebook</a><a href="https://www.instagram.com/denver.tamilchurch01/" target="_blank" rel="noopener noreferrer">Instagram</a><a href="https://www.youtube.com/@TamilChurchDenver" target="_blank" rel="noopener noreferrer">YouTube</a></div></div>`;
+  setLanguage(localStorage.getItem('siteLanguage') || 'en');
+};
+
 const initInteractiveContactCards = () => {
   document.querySelectorAll('.shared-contact-card, .contact-details .contact-detail-block').forEach((card) => {
     const action = card.querySelector('a');
@@ -1233,6 +1261,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initPreviousServices();
   initGallery();
   initSharedContactStrip();
+  initProfessionalFooter();
   initInteractiveContactCards();
   initMinistryDialogs();
   initChurchChat();

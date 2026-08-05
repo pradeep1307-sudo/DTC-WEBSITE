@@ -1,2 +1,5 @@
 # Local service runtime output
 *.log
+__pycache__/
+*.pyc
+Microsoft/

@@ -1,6 +1,8 @@
 # Church gallery folders
 
-Add `.jpg`, `.jpeg`, `.png`, or `.webp` photos to the event folders below. The Gallery page automatically creates one album per folder and uses the first image alphabetically as its cover.
+The recommended workflow is the local Media Manager at `http://localhost:8000/admin.html`. It creates folders, imports `.jpg`, `.jpeg`, `.png`, or `.webp` photos, sets album covers, and updates `manifest.json` automatically.
+
+For manual management, add photos to the event folders and update `manifest.json`. The first image listed for an album is its cover.
 
 To add a new event, create another folder inside `assets/gallery`. Use a readable hyphenated name such as `church-picnic-2026`.
 
