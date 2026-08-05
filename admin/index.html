@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Media Manager | Denver Tamil Church</title>
+    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <a class="admin-skip" href="#admin-main">Skip to media manager</a>
+    <header class="admin-header">
+      <a href="../index.html" class="admin-brand" aria-label="Denver Tamil Church home"><img src="../lOGO.png" alt="Denver Tamil Church" width="142" height="94" /><span><strong>Website Media Manager</strong><small>Photos, albums, and event posters</small></span></a>
+      <a class="admin-view-site" href="../gallery.html" target="_blank" rel="noopener noreferrer">Preview Gallery <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main id="admin-main" class="admin-main">
+      <section class="admin-welcome" aria-labelledby="admin-title">
+        <div><p class="admin-eyebrow">LOCAL ADMINISTRATION</p><h1 id="admin-title">Manage church media with confidence.</h1><p>Select the local <strong>DTC App</strong> project folder. Changes are written directly to the website folders and both manifests are kept synchronized automatically.</p></div>
+        <button class="admin-primary" type="button" data-select-project>Select Project Folder</button>
+      </section>
+
+      <div class="admin-status" role="status" aria-live="polite" data-admin-status><span aria-hidden="true"></span><strong>No project folder selected</strong><small>Use Microsoft Edge or Google Chrome on the church computer.</small></div>
+
+      <section class="admin-help" aria-label="Media publishing steps">
+        <article><span>1</span><div><strong>Select the project</strong><p>Choose the folder containing index.html and the assets folder.</p></div></article>
+        <article><span>2</span><div><strong>Organize and preview</strong><p>Create albums, add photos, select covers, and reorder images.</p></div></article>
+        <article><span>3</span><div><strong>Publish your changes</strong><p>Review the Gallery and Upcoming Events pages, then commit and push.</p></div></article>
+      </section>
+
+      <div class="admin-tabs" role="tablist" aria-label="Media type">
+        <button type="button" role="tab" aria-selected="true" aria-controls="gallery-manager" id="gallery-tab" data-admin-tab="gallery">Gallery Albums</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="event-manager" id="event-tab" data-admin-tab="events">Event Posters</button>
+      </div>
+
+      <section class="admin-panel" id="gallery-manager" role="tabpanel" aria-labelledby="gallery-tab" data-admin-panel="gallery">
+        <aside class="admin-sidebar">
+          <div class="admin-panel-heading"><div><p class="admin-eyebrow">ALBUMS</p><h2>Church Gallery</h2></div><span data-album-total>0</span></div>
+          <form class="admin-create-album" data-create-album><label for="new-album-name">New album name</label><div><input id="new-album-name" name="albumName" type="text" maxlength="60" placeholder="Example: Church Picnic 2026" required /><button type="submit">Create</button></div></form>
+          <div class="admin-album-list" data-album-list><p class="admin-empty">Select the project folder to load albums.</p></div>
+        </aside>
+        <div class="admin-workspace">
+          <div class="admin-workspace-heading"><div><p class="admin-eyebrow">SELECTED ALBUM</p><h2 data-selected-album>No album selected</h2><p data-selected-summary>Choose an album from the left.</p></div><label class="admin-upload is-disabled"><input type="file" accept="image/jpeg,image/png,image/webp" multiple data-gallery-upload disabled /><span>Add Photos</span></label></div>
+          <div class="admin-photo-grid" data-gallery-grid><div class="admin-empty-state"><span aria-hidden="true">▧</span><h3>Your album photos will appear here.</h3><p>Add JPG, PNG, or WebP files. Use “Make cover” to choose the album thumbnail.</p></div></div>
+        </div>
+      </section>
+
+      <section class="admin-panel" id="event-manager" role="tabpanel" aria-labelledby="event-tab" data-admin-panel="events" hidden>
+        <div class="admin-workspace admin-workspace--wide">
+          <div class="admin-workspace-heading"><div><p class="admin-eyebrow">UPCOMING EVENTS</p><h2>Event Poster Carousel</h2><p>Posters appear in this order. The first poster is shown first to visitors.</p></div><label class="admin-upload is-disabled"><input type="file" accept="image/jpeg,image/png,image/webp" multiple data-event-upload disabled /><span>Add Event Posters</span></label></div>
+          <div class="admin-photo-grid admin-photo-grid--events" data-event-grid><div class="admin-empty-state"><span aria-hidden="true">◇</span><h3>Event posters will appear here.</h3><p>Select the project folder to manage upcoming-event images.</p></div></div>
+        </div>
+      </section>
+
+      <section class="admin-publish" aria-labelledby="publish-title"><div><p class="admin-eyebrow">BEFORE PUBLISHING</p><h2 id="publish-title">Review the visitor experience.</h2><p>Open both pages and confirm image cropping, album order, spelling, and permission to publish identifiable people—especially children.</p></div><div><a href="../gallery.html" target="_blank" rel="noopener noreferrer">Open Gallery</a><a href="../events.html" target="_blank" rel="noopener noreferrer">Open Events</a></div></section>
+    </main>
+    <template id="admin-photo-template"><article class="admin-photo"><div class="admin-photo-preview"><img alt="" /><span class="admin-cover-badge">Cover</span></div><div class="admin-photo-info"><strong></strong><small></small></div><div class="admin-photo-actions"><button type="button" data-action="cover">Make cover</button><button type="button" data-action="up" aria-label="Move earlier">↑</button><button type="button" data-action="down" aria-label="Move later">↓</button><button class="admin-danger" type="button" data-action="delete">Delete</button></div></article></template>
+    <script src="../js/admin.js"></script>
+  </body>
+</html>

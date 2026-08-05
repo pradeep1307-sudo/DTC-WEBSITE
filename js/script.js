@@ -1262,6 +1262,63 @@ const initHomeLiveLauncher = () => {
   document.body.append(link);
 };
 
+const initDailyVerse = async () => {
+  if (document.querySelector('.daily-verse-notice')) return;
+
+  const getDenverDate = () => {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Denver',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).formatToParts(new Date());
+    const value = (type) => Number(parts.find((part) => part.type === type)?.value);
+    return { year: value('year'), month: value('month'), day: value('day') };
+  };
+
+  const today = getDenverDate();
+
+  const fallback = {
+    reference: 'Psalm 118:24',
+    text: 'This is the day that Yahweh has made. We will rejoice and be glad in it!'
+  };
+  let verse = fallback;
+
+  try {
+    const response = await fetch('assets/data/daily-verses.json');
+    if (!response.ok) throw new Error(`Verse data returned ${response.status}`);
+    const data = await response.json();
+    if (Array.isArray(data.verses) && data.verses.length) {
+      const startOfYear = Date.UTC(today.year, 0, 1);
+      const currentDay = Date.UTC(today.year, today.month - 1, today.day);
+      const dayOfYear = Math.floor((currentDay - startOfYear) / 86400000);
+      verse = data.verses[dayOfYear % data.verses.length];
+    }
+  } catch (error) {
+    console.warn('Using the built-in daily verse:', error);
+  }
+
+  const notice = document.createElement('aside');
+  notice.className = 'daily-verse-notice';
+  notice.setAttribute('aria-label', 'Verse of the day');
+  notice.innerHTML = `
+    <div class="daily-verse-mark" aria-hidden="true">&#10013;</div>
+    <div class="daily-verse-copy">
+      <span>Verse of the Day <small>WEB</small></span>
+      <blockquote></blockquote>
+      <cite></cite>
+    </div>
+    <button type="button" class="daily-verse-close" aria-label="Dismiss verse of the day">&times;</button>`;
+  notice.querySelector('blockquote').textContent = `“${verse.text}”`;
+  notice.querySelector('cite').textContent = verse.reference;
+  notice.querySelector('.daily-verse-close').addEventListener('click', () => {
+    notice.classList.add('is-closing');
+    window.setTimeout(() => notice.remove(), 240);
+  });
+  document.body.append(notice);
+  window.requestAnimationFrame(() => notice.classList.add('is-visible'));
+};
+
 const initMinistryDialogs = () => {
   const cards = [...document.querySelectorAll('.ministry-card')];
   const dialogs = [...document.querySelectorAll('.ministry-dialog')];
@@ -1313,8 +1370,6 @@ const initMinistryDialogs = () => {
 };
 
 window.addEventListener('DOMContentLoaded', () => {
-  document.body.style.opacity = '1';
-  document.body.classList.add('is-loaded');
   restoreHomeMenuPosition();
   normalizeNavigation();
   initContactSubject();
@@ -1336,6 +1391,14 @@ window.addEventListener('DOMContentLoaded', () => {
   initMinistryDialogs();
   initChurchChat();
   initHomeLiveLauncher();
+  initDailyVerse();
+
+  // Reveal the prepared homepage only after its legacy sections have been
+  // removed and its current layout has been assembled, preventing a flash of
+  // the pre-enhancement markup during refresh.
+  document.body.classList.add('is-loaded');
+  document.body.classList.remove('home-preparing');
+  document.body.style.opacity = '1';
 
   document.querySelectorAll('a[href]').forEach((link) => {
     if (link.target || link.href.startsWith('mailto:') || link.href.startsWith('tel:')) {

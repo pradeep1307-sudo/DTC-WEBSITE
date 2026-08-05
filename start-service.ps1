@@ -31,6 +31,7 @@ try {
 
       if ($requestLine -notmatch '^GET\s+([^\s?]+)') { $requestPath = $null } else { $requestPath = [Uri]::UnescapeDataString($Matches[1].TrimStart('/')) }
       if ([string]::IsNullOrWhiteSpace($requestPath)) { $requestPath = 'index.html' }
+      elseif ($requestPath.EndsWith('/')) { $requestPath = "${requestPath}index.html" }
 
       if ($requestPath -eq 'api/upcoming-events') {
         $upcomingFolder = Join-Path $root 'assets/upcoming'

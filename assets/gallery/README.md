@@ -1,6 +1,6 @@
 # Church gallery folders
 
-The recommended workflow is the local Media Manager at `http://localhost:8000/admin.html`. It creates folders, imports `.jpg`, `.jpeg`, `.png`, or `.webp` photos, sets album covers, and updates `manifest.json` automatically.
+The recommended workflow is the local Media Manager at `http://localhost:8000/admin/`. It creates folders, imports `.jpg`, `.jpeg`, `.png`, or `.webp` photos, sets album covers, and updates `manifest.json` automatically.
 
 For manual management, add photos to the event folders and update `manifest.json`. The first image listed for an album is its cover.
 

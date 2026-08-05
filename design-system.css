@@ -37,6 +37,7 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
+body.home-preparing { opacity: 0; transition: none; }
 h1, h2, h3 {
   color: var(--color-ink);
   font-weight: 900;
@@ -951,3 +952,44 @@ body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; 
 .site-footer-bottom a:hover,.site-footer-bottom a:focus-visible { color: #fff; }
 @media (max-width: 900px) { .site-footer-main { grid-template-columns: 1.3fr 1fr 1fr; }.site-footer-brand { grid-column: 1/-1; }.site-footer-service { grid-column: auto; } }
 @media (max-width: 620px) { .site-footer-main { width: min(calc(100% - 30px),1320px); padding: 35px 0 28px; grid-template-columns: 1fr 1fr; gap: 28px 20px; }.site-footer-brand,.site-footer-service { grid-column: 1/-1; }.site-footer-bottom { padding: 17px 15px; align-items: flex-start; flex-direction: column; }.site-footer-bottom > div { gap: 13px; } }
+
+/* Daily WEB scripture notice shared by every public page. */
+.daily-verse-notice {
+  position: fixed;
+  z-index: 1200;
+  top: 102px;
+  left: clamp(12px, 1.8vw, 24px);
+  display: grid;
+  width: min(calc(100% - 24px), 330px);
+  padding: 11px 37px 11px 12px;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  border: 1px solid rgba(255,255,255,.18);
+  border-left: 5px solid #e1193e;
+  border-radius: 12px;
+  background: rgba(14,14,14,.96);
+  box-shadow: 0 12px 30px rgba(0,0,0,.24);
+  color: #fff;
+  opacity: 0;
+  transform: translateY(18px) scale(.98);
+  transition: opacity 240ms ease, transform 320ms cubic-bezier(.2,.8,.2,1);
+  backdrop-filter: blur(14px);
+}
+.daily-verse-notice.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+.daily-verse-notice.is-closing { opacity: 0; transform: translateY(12px) scale(.98); }
+.daily-verse-mark { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: #e1193e; color: #fff; font-size: .9rem; box-shadow: 0 0 0 3px rgba(225,25,62,.14); }
+.daily-verse-copy > span { display: block; margin-bottom: 2px; color: #ff6b85; font-size: .52rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.daily-verse-copy > span small { margin-left: 4px; color: #aaa; font-size: .48rem; }
+.daily-verse-copy blockquote { display: -webkit-box; margin: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: #fff; font-family: Georgia, 'Times New Roman', serif; font-size: .72rem; font-weight: 700; line-height: 1.3; }
+.daily-verse-copy cite { display: block; margin-top: 3px; color: #cfcfcf; font-size: .55rem; font-style: normal; font-weight: 800; }
+.daily-verse-close { position: absolute; top: 5px; right: 5px; display: grid; width: 26px; height: 26px; padding: 0; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #bbb; font-size: 1.05rem; line-height: 1; cursor: pointer; transition: color 160ms ease, background 160ms ease, transform 160ms ease; }
+.daily-verse-close:hover,.daily-verse-close:focus-visible { background: rgba(255,255,255,.12); color: #fff; transform: rotate(7deg); }
+@media (max-width: 620px) {
+  .daily-verse-notice { top: 88px; left: 8px; width: min(calc(100% - 16px), 290px); padding: 9px 34px 9px 10px; grid-template-columns: 28px minmax(0,1fr); gap: 8px; border-radius: 11px; }
+  .daily-verse-mark { width: 28px; height: 28px; font-size: .82rem; }
+  .daily-verse-copy blockquote { font-size: .67rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .daily-verse-notice,.daily-verse-close { transition: none; }
+}

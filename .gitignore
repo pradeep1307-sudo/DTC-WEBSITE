@@ -3,3 +3,6 @@
 __pycache__/
 *.pyc
 Microsoft/
+
+# Local Microsoft Store installer; not a deployable website asset
+English Bible (WEB) Installer.exe
