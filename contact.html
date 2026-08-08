@@ -34,8 +34,8 @@
 
       <section class="contact-layout">
         <form class="contact-form" id="contact-form" action="mailto:info@denvertamilchurch.com" method="post" enctype="text/plain">
-          <h2><span class="lang" data-lang="en">Send a Message</span><span class="lang" data-lang="ta">ஒரு செய்தி அனுப்புங்கள்</span></h2>
-          <p class="contact-form-note"><span class="lang" data-lang="en">We’ll respond as soon as possible. Fields marked * are required.</span><span class="lang" data-lang="ta">கூடிய விரைவில் பதிலளிப்போம். * குறிக்கப்பட்ட புலங்கள் அவசியம்.</span></p>
+          <div class="contact-form-heading"><span class="contact-form-heading-icon" aria-hidden="true">✦</span><div><p class="eyebrow">LET’S CONNECT</p><h2><span class="lang" data-lang="en">Send a Message</span><span class="lang" data-lang="ta">ஒரு செய்தி அனுப்புங்கள்</span></h2><p class="contact-form-note"><span class="lang" data-lang="en">We’ll respond as soon as possible. Fields marked * are required.</span><span class="lang" data-lang="ta">கூடிய விரைவில் பதிலளிப்போம். * குறிக்கப்பட்ட புலங்கள் அவசியம்.</span></p></div></div>
+          <div class="contact-form-fields">
           <label><span class="lang" data-lang="en">Your Name *</span><span class="lang" data-lang="ta">உங்கள் பெயர் *</span><input type="text" name="name" autocomplete="name" placeholder="First and last name" required /></label>
           <label><span class="lang" data-lang="en">Email Address *</span><span class="lang" data-lang="ta">மின்னஞ்சல் முகவரி *</span><input type="email" name="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required /></label>
           <label><span class="lang" data-lang="en">Phone (optional)</span><span class="lang" data-lang="ta">தொலைபேசி (விருப்பமானது)</span><input type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="(720) 555-0123" /></label>
@@ -55,9 +55,9 @@
               <option value="General Question">General Question / பொதுக் கேள்வி</option>
             </select>
           </label>
+          </div>
           <label class="contact-form-message"><span class="lang" data-lang="en">Your Message *</span><span class="lang" data-lang="ta">உங்கள் செய்தி *</span><textarea name="message" rows="6" placeholder="How can we help?" required></textarea></label>
-          <button class="btn btn-primary" type="submit"><span class="lang" data-lang="en">Send Message</span><span class="lang" data-lang="ta">செய்தி அனுப்புங்கள்</span></button>
-          <p class="contact-mail-note"><span class="lang" data-lang="en">Sending opens your email application with the message details.</span><span class="lang" data-lang="ta">அனுப்புவது உங்கள் மின்னஞ்சல் பயன்பாட்டில் செய்தி விவரங்களைத் திறக்கும்.</span></p>
+          <div class="contact-form-actions"><button class="btn btn-primary" type="submit"><span class="lang" data-lang="en">Send Message</span><span class="lang" data-lang="ta">செய்தி அனுப்புங்கள்</span><span class="contact-submit-arrow" aria-hidden="true">→</span></button><p class="contact-mail-note"><span aria-hidden="true">▣</span><span class="lang" data-lang="en">Securely opens your email application with the message details.</span><span class="lang" data-lang="ta">உங்கள் மின்னஞ்சல் பயன்பாட்டில் செய்தி விவரங்களைப் பாதுகாப்பாகத் திறக்கும்.</span></p></div>
         </form>
 
         <aside class="contact-details">
@@ -108,6 +108,6 @@
     </main>
 
     <footer class="footer page-footer"><div><p>@2004 DENVER TAMIL CHURCH · 9052 W Ken Caryl Ave · Littleton, CO 80128</p></div></footer>
-    <script src="js/script.js"></script>
+    <script src="js/script.js?v=20260805-modern-contact"></script>
   </body>
 </html>

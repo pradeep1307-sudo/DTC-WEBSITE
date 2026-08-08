@@ -3,6 +3,16 @@ param(
 )
 
 $root = $PSScriptRoot
+$pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+if ($pythonCommand) {
+  Push-Location $root
+  try {
+    & $pythonCommand.Source server.py
+    exit $LASTEXITCODE
+  } finally {
+    Pop-Location
+  }
+}
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, $Port)
 try {
@@ -143,7 +153,7 @@ try {
         $bytes = [IO.File]::ReadAllBytes($candidate)
         $extension = [IO.Path]::GetExtension($candidate).ToLowerInvariant()
         $contentType = if ($mimeTypes.ContainsKey($extension)) { $mimeTypes[$extension] } else { 'application/octet-stream' }
-        $cacheHeader = if ($requestPath -in @('assets/upcoming/events.json', 'assets/upcoming/manifest.json')) {
+        $cacheHeader = if ($requestPath -in @('admin/index.html', 'admin.html', 'admin/admin.css', 'js/admin.js', 'js/script.js', 'assets/upcoming/events.json', 'assets/upcoming/manifest.json', 'assets/backgrounds/manifest.json', 'assets/pastor/manifest.json')) {
           "Cache-Control: no-store, no-cache, must-revalidate, max-age=0`r`nPragma: no-cache`r`nExpires: 0`r`n"
         } else { '' }
         $header = "HTTP/1.1 200 OK`r`nContent-Type: $contentType`r`nContent-Length: $($bytes.Length)`r`n${cacheHeader}Connection: close`r`n`r`n"

@@ -12,9 +12,17 @@ class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
         request_path = self.path.split('?', 1)[0]
         if request_path in {
+            '/admin/',
+            '/admin/index.html',
+            '/admin.html',
+            '/admin/admin.css',
+            '/js/admin.js',
+            '/js/script.js',
             '/api/upcoming-events',
             '/assets/upcoming/events.json',
-            '/assets/upcoming/manifest.json'
+            '/assets/upcoming/manifest.json',
+            '/assets/backgrounds/manifest.json',
+            '/assets/pastor/manifest.json'
         }:
             self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             self.send_header('Pragma', 'no-cache')

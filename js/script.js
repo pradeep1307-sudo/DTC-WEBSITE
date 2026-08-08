@@ -113,7 +113,7 @@ if (yearElement) {
 
 const featuredHeroImages = {
   home: [
-    'assets/WhatsApp Image 2024-12-25 at 20.59.50_7dd35547.jpg'
+    'assets/backgrounds/church-family-rooted.jpg'
   ],
   who: [
     'assets/images/church-sanctuary-hero.jpg',
@@ -449,6 +449,15 @@ const initSharedHeaderIdentity = () => {
   headers.forEach((header) => {
     const brand = header.querySelector('.brand');
     const languageControl = header.querySelector('.lang-card, .lang-switch');
+    if (languageControl && !languageControl.querySelector('.home-admin-link')) {
+      const adminLink = document.createElement('a');
+      adminLink.className = 'home-admin-link';
+      adminLink.href = 'admin/';
+      adminLink.setAttribute('aria-label', 'Open website administration');
+      adminLink.title = 'Website administration';
+      adminLink.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94a7.8 7.8 0 0 0 .05-.94 7.8 7.8 0 0 0-.05-.94l2.03-1.58-1.92-3.32-2.39.96a7.3 7.3 0 0 0-1.63-.95L14.87 3h-3.84l-.36 3.17c-.58.24-1.12.56-1.63.95l-2.39-.96-1.92 3.32 2.03 1.58a7.8 7.8 0 0 0-.05.94c0 .32.02.63.05.94l-2.03 1.58 1.92 3.32 2.39-.96c.5.39 1.05.71 1.63.95l.36 3.17h3.84l.36-3.17a7.3 7.3 0 0 0 1.63-.95l2.39.96 1.92-3.32-2.03-1.58ZM12.95 15.5A3.5 3.5 0 1 1 12.95 8a3.5 3.5 0 0 1 0 7.5Z" fill="currentColor"/></svg>';
+      languageControl.append(adminLink);
+    }
     brand?.querySelector('.brand-name')?.remove();
     if (brand && !header.querySelector('.header-service-countdown')) {
       let brandCluster = brand.closest('.brand-wrapper, .header-brand-cluster');
@@ -834,6 +843,49 @@ const initSharedContactStrip = () => {
     </article>`;
   footer.before(strip);
   setLanguage(localStorage.getItem('siteLanguage') || 'en');
+};
+
+const loadManagedBackground = async () => {
+  try {
+    const response = await fetch(`assets/backgrounds/manifest.json?v=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) return;
+    const manifest = await response.json();
+    if (manifest?.homeHero) featuredHeroImages.home = [manifest.homeHero];
+    if (Array.isArray(manifest?.homeHeaderSlides) && manifest.homeHeaderSlides.length) {
+      homeHeroSlides.splice(0, homeHeroSlides.length, ...manifest.homeHeaderSlides.map((src) => ({ src, tone: 'dark' })));
+    }
+  } catch { /* Keep the bundled background when the manifest is unavailable. */ }
+};
+
+let pastorPhotoSlides = ['assets/pastor/pastor-jude-and-merina.jpg'];
+const loadManagedPastorPhotos = async () => {
+  try {
+    const response = await fetch(`assets/pastor/manifest.json?v=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) return;
+    const manifest = await response.json();
+    if (Array.isArray(manifest) && manifest.length) pastorPhotoSlides = manifest;
+  } catch { /* Keep the bundled pastor photo when the manifest is unavailable. */ }
+};
+const initPastorPhotoRotation = () => {
+  const rotator = document.querySelector('[data-pastor-photo-rotator]');
+  if (!rotator || !pastorPhotoSlides.length) return;
+  rotator.innerHTML = '';
+  const slides = pastorPhotoSlides.map((src, index) => {
+    const image = document.createElement('img');
+    image.src = src;
+    image.alt = 'Pastor Jude Francis and Merina Francis';
+    image.loading = index === 0 ? 'eager' : 'lazy';
+    image.className = index === 0 ? 'is-active' : '';
+    rotator.append(image);
+    return image;
+  });
+  if (slides.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let current = 0;
+  window.setInterval(() => {
+    slides[current].classList.remove('is-active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('is-active');
+  }, 5200);
 };
 
 const initProfessionalFooter = () => {
@@ -1302,7 +1354,7 @@ const initDailyVerse = async () => {
   notice.className = 'daily-verse-notice';
   notice.setAttribute('aria-label', 'Verse of the day');
   notice.innerHTML = `
-    <div class="daily-verse-mark" aria-hidden="true">&#10013;</div>
+    <button type="button" class="daily-verse-mark daily-verse-drag" aria-label="Move verse card" title="Drag to move · double-click to reset">&#10013;</button>
     <div class="daily-verse-copy">
       <span>Verse of the Day <small>WEB</small></span>
       <blockquote></blockquote>
@@ -1311,12 +1363,86 @@ const initDailyVerse = async () => {
     <button type="button" class="daily-verse-close" aria-label="Dismiss verse of the day">&times;</button>`;
   notice.querySelector('blockquote').textContent = `“${verse.text}”`;
   notice.querySelector('cite').textContent = verse.reference;
+  const dragHandle = notice.querySelector('.daily-verse-drag');
+  const positionKey = 'dtcDailyVersePosition';
+  const placeNotice = (left, top, save = false) => {
+    const maxLeft = Math.max(8, window.innerWidth - notice.offsetWidth - 8);
+    const maxTop = Math.max(8, window.innerHeight - notice.offsetHeight - 8);
+    const nextLeft = Math.min(Math.max(8, left), maxLeft);
+    const nextTop = Math.min(Math.max(8, top), maxTop);
+    notice.style.left = `${nextLeft}px`;
+    notice.style.top = `${nextTop}px`;
+    notice.style.right = 'auto';
+    notice.style.bottom = 'auto';
+    if (save) localStorage.setItem(positionKey, JSON.stringify({ left: nextLeft, top: nextTop }));
+  };
+  let dragState = null;
+  dragHandle.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    const bounds = notice.getBoundingClientRect();
+    dragState = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, left: bounds.left, top: bounds.top };
+    dragHandle.setPointerCapture(event.pointerId);
+    notice.classList.add('is-dragging');
+    event.preventDefault();
+  });
+  dragHandle.addEventListener('pointermove', (event) => {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    placeNotice(dragState.left + event.clientX - dragState.x, dragState.top + event.clientY - dragState.y);
+  });
+  const finishDrag = (event) => {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    const bounds = notice.getBoundingClientRect();
+    dragState = null;
+    notice.classList.remove('is-dragging');
+    placeNotice(bounds.left, bounds.top, true);
+  };
+  dragHandle.addEventListener('pointerup', finishDrag);
+  dragHandle.addEventListener('pointercancel', finishDrag);
+  dragHandle.addEventListener('dblclick', () => {
+    localStorage.removeItem(positionKey);
+    notice.removeAttribute('style');
+  });
   notice.querySelector('.daily-verse-close').addEventListener('click', () => {
     notice.classList.add('is-closing');
     window.setTimeout(() => notice.remove(), 240);
   });
   document.body.append(notice);
-  window.requestAnimationFrame(() => notice.classList.add('is-visible'));
+  window.requestAnimationFrame(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(positionKey));
+      if (Number.isFinite(saved?.left) && Number.isFinite(saved?.top)) placeNotice(saved.left, saved.top);
+    } catch { /* Ignore an invalid saved position. */ }
+    notice.classList.add('is-visible');
+  });
+  window.addEventListener('resize', () => {
+    if (!notice.isConnected || !localStorage.getItem(positionKey)) return;
+    const bounds = notice.getBoundingClientRect();
+    placeNotice(bounds.left, bounds.top, true);
+  }, { passive: true });
+};
+
+const initPublishedMediaUpdates = () => {
+  const currentPage = getPageKey();
+  const shouldRefresh = (type) => (
+    type === 'events' && ['index.html', 'events.html', 'event-details.html'].includes(currentPage)
+  ) || (
+    type === 'gallery' && currentPage === 'gallery.html'
+  ) || (
+    type === 'background' && currentPage === 'index.html'
+  ) || (
+    type === 'pastor' && currentPage === 'index.html'
+  );
+  const receiveUpdate = (message) => {
+    if (message?.type && shouldRefresh(message.type)) window.location.reload();
+  };
+  if ('BroadcastChannel' in window) {
+    const channel = new BroadcastChannel('dtc-media-updates');
+    channel.addEventListener('message', (event) => receiveUpdate(event.data));
+  }
+  window.addEventListener('storage', (event) => {
+    if (event.key !== 'dtc-media-update' || !event.newValue) return;
+    try { receiveUpdate(JSON.parse(event.newValue)); } catch { /* Ignore malformed external storage values. */ }
+  });
 };
 
 const initMinistryDialogs = () => {
@@ -1369,7 +1495,8 @@ const initMinistryDialogs = () => {
   });
 };
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
+  await Promise.all([loadManagedBackground(), loadManagedPastorPhotos()]);
   restoreHomeMenuPosition();
   normalizeNavigation();
   initContactSubject();
@@ -1382,6 +1509,7 @@ window.addEventListener('DOMContentLoaded', () => {
   addUpcomingEventCarousel();
   setLanguage(localStorage.getItem('siteLanguage') || 'en');
   initHomeHeroBackground();
+  initPastorPhotoRotation();
   initFeaturedHeroRotation();
   initPreviousServices();
   initGallery();
@@ -1392,6 +1520,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initChurchChat();
   initHomeLiveLauncher();
   initDailyVerse();
+  initPublishedMediaUpdates();
 
   // Reveal the prepared homepage only after its legacy sections have been
   // removed and its current layout has been assembled, preventing a flash of

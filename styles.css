@@ -4193,6 +4193,13 @@ li { line-height: 1.65; }
 .home-pastor-copy .btn { margin-top: 10px; }
 .home-pastor-photo { width: min(100%, 310px); margin: 0 auto; overflow: hidden; border: 8px solid #fff; border-radius: 18px; background: #111; box-shadow: 0 18px 38px rgba(0,0,0,.18); }
 .home-pastor-photo img { width: 100%; max-height: 330px; object-fit: cover; object-position: center top; }
+.home-pastor-photo-rotator { position:relative; height:330px; overflow:hidden; background:#111; }
+.home-pastor-photo-rotator img { position:absolute; inset:0; width:100%; height:100%; max-height:none; opacity:0; transform:scale(1.035); transition:opacity .85s ease,transform 1.1s ease; }
+.home-pastor-photo-rotator img.is-active { opacity:1; transform:scale(1); }
+.home-pastor-photo .home-pastor-photo-rotator img { max-height:none; }
+@media (prefers-reduced-motion: reduce) {
+  .home-pastor-photo-rotator img { transition:none; transform:none; }
+}
 .home-pastor-photo figcaption { padding: 10px 12px; background: #111; color: #fff; font-size: .72rem; font-weight: 700; text-align: center; text-transform: uppercase; }
 @media (max-width: 900px) {
   .home-beliefs-layout,
@@ -5228,3 +5235,57 @@ li { line-height: 1.65; }
   .contact-details .contact-detail-block { min-height: 0; }
   .shared-contact-image { flex-basis: 90px; }
 }
+
+/* 2026 contact experience */
+.contact-page { width:min(1180px,100%); }
+.contact-layout { gap:20px; }
+.contact-form {
+  display:block;
+  padding:clamp(24px,4vw,42px);
+  overflow:hidden;
+  border:1px solid #d7d7d7;
+  border-top:5px solid #cf1034;
+  border-radius:22px;
+  background:linear-gradient(145deg,#fff 0%,#f7f7f7 100%);
+  box-shadow:0 22px 55px rgba(0,0,0,.1);
+  animation:contact-enter .55s cubic-bezier(.2,.75,.25,1) both;
+}
+.contact-form::after { position:absolute; top:-130px; right:-130px; width:300px; height:300px; border:1px solid rgba(207,16,52,.13); border-radius:50%; content:''; pointer-events:none; }
+.contact-form-heading { position:relative; z-index:1; display:flex; margin-bottom:24px; align-items:flex-start; gap:14px; }
+.contact-form-heading-icon { display:grid; width:46px; height:46px; flex:0 0 46px; place-items:center; border-radius:12px; background:#171717; color:#fff; font-size:1.1rem; box-shadow:0 9px 22px rgba(0,0,0,.18); }
+.contact-form-heading .eyebrow { margin:0 0 4px; color:#b40d2c; font-size:.65rem; }
+.contact-form-heading h2 { margin:0; color:#171717; font-size:clamp(1.55rem,2.5vw,2rem); }
+.contact-form-heading .contact-form-note { margin:6px 0 0; color:#676767; font-size:.78rem; }
+.contact-form-fields { position:relative; z-index:1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.contact-form label { display:grid; gap:7px; color:#333; font-size:.73rem; font-weight:900; letter-spacing:.055em; text-transform:uppercase; transition:color .2s ease; }
+.contact-form label:focus-within { color:#b40d2c; }
+.contact-form input,.contact-form select,.contact-form textarea { min-height:52px; padding:13px 15px; border:1px solid #cfcfcf; border-radius:10px; background:#fff; color:#171717; font-size:.9rem; font-weight:600; letter-spacing:0; text-transform:none; box-shadow:0 2px 7px rgba(0,0,0,.035); transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease; }
+.contact-form input:hover,.contact-form select:hover,.contact-form textarea:hover { border-color:#888; }
+.contact-form input:focus,.contact-form select:focus,.contact-form textarea:focus { border-color:#171717; outline:0; box-shadow:0 0 0 4px rgba(207,16,52,.11),0 7px 18px rgba(0,0,0,.07); transform:translateY(-1px); }
+.contact-form :is(input,select,textarea):user-invalid { border-color:#b40d2c; box-shadow:0 0 0 3px rgba(180,13,44,.09); }
+.contact-form :is(input,select,textarea):user-valid { border-color:#6a9b78; }
+.contact-form-message { position:relative; z-index:1; margin-top:16px; }
+.contact-form textarea { min-height:145px; resize:vertical; }
+.contact-form-actions { position:relative; z-index:1; display:flex; margin-top:18px; align-items:center; gap:18px; }
+.contact-form-actions .btn { display:inline-flex; min-width:175px; min-height:50px; margin:0; padding:12px 18px; align-items:center; justify-content:center; gap:10px; border:0; border-radius:9px; background:#171717; color:#fff; font-size:.76rem; box-shadow:0 11px 24px rgba(0,0,0,.2); transition:background .2s ease,box-shadow .2s ease,transform .2s ease; }
+.contact-form-actions .btn:hover,.contact-form-actions .btn:focus-visible { background:#cf1034; box-shadow:0 14px 28px rgba(207,16,52,.25); transform:translateY(-2px); }
+.contact-submit-arrow { font-size:1rem; transition:transform .2s ease; }
+.contact-form-actions .btn:hover .contact-submit-arrow,.contact-form-actions .btn:focus-visible .contact-submit-arrow { transform:translateX(4px); }
+.contact-form-actions .contact-mail-note { display:flex; margin:0; align-items:center; gap:8px; color:#6d6d6d; font-size:.7rem; line-height:1.4; }
+.contact-form-actions .contact-mail-note > span:first-child { color:#258044; font-size:.9rem; }
+.contact-details .contact-detail-block { animation:contact-enter .55s cubic-bezier(.2,.75,.25,1) both; }
+.contact-details .contact-detail-block:nth-child(1) { animation-delay:.08s; }
+.contact-details .contact-detail-block:nth-child(2) { animation-delay:.14s; }
+.contact-details .contact-detail-block:nth-child(3) { animation-delay:.2s; }
+@keyframes contact-enter { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
+@media(max-width:720px){.contact-form-fields{grid-template-columns:1fr}.contact-form-actions{align-items:stretch;flex-direction:column}.contact-form-actions .btn{width:100%}.contact-form-actions .contact-mail-note{justify-content:center;text-align:center}.contact-form-heading-icon{width:40px;height:40px;flex-basis:40px}.contact-form{border-radius:16px}}
+@media(prefers-reduced-motion:reduce){.contact-form,.contact-details .contact-detail-block{animation:none}.contact-form input,.contact-form select,.contact-form textarea,.contact-form-actions .btn,.contact-submit-arrow{transition:none}}
+
+/* Homepage administration shortcut */
+.home-page-header .lang-card,.hero > .header-top .lang-card,.page-nav .lang-switch { display:flex; align-items:center; gap:3px; }
+.home-admin-link { display:grid; width:34px; height:34px; margin-left:3px; place-items:center; border-left:1px solid rgba(17,17,17,.16); border-radius:50%; color:#171717; text-decoration:none; transition:color .2s ease,background .2s ease,box-shadow .2s ease,transform .28s ease; }
+.home-admin-link svg { width:18px; height:18px; transition:transform .4s cubic-bezier(.2,.8,.2,1); }
+.home-admin-link:hover,.home-admin-link:focus-visible { background:#171717; color:#fff; box-shadow:0 7px 18px rgba(0,0,0,.2); transform:translateY(-1px); }
+.home-admin-link:hover svg,.home-admin-link:focus-visible svg { transform:rotate(90deg); }
+@media(max-width:620px){.home-admin-link{width:32px;height:32px}.home-admin-link svg{width:17px;height:17px}}
+@media(prefers-reduced-motion:reduce){.home-admin-link,.home-admin-link svg{transition:none}}

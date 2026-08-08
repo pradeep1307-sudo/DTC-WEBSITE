@@ -5,6 +5,12 @@ const loadEvents = async () => {
   if (!response.ok) throw new Error('Unable to load events');
   return response.json();
 };
+const loadEventPosters = async () => {
+  const response = await fetch(`assets/upcoming/manifest.json?v=${Date.now()}`, { cache: 'no-store' });
+  if (!response.ok) throw new Error('Unable to load event posters');
+  const posters = await response.json();
+  return Array.isArray(posters) ? posters : [];
+};
 
 const eventUrl = (event) => `event-details.html?id=${encodeURIComponent(event.id)}`;
 const escapeText = (value = '') => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
@@ -83,11 +89,25 @@ const renderEventAgenda = (events) => {
   startAutoScroll();
 };
 
-const renderEventCards = (events) => {
+const renderEventCards = (events, posters) => {
   const list = document.querySelector('[data-event-list]');
   if (!list) return;
   const visibleEvents = events.filter((event) => !event.calendarOnly);
-  list.innerHTML = visibleEvents.map((event, index) => `<article class="event-poster-card" data-event-slide="${index}"><a href="${eventUrl(event)}"><figure><img src="${escapeText(event.image)}" alt="${escapeText(event.title)} event poster" width="1672" height="941" loading="lazy" /><span class="event-poster-image-label">Featured event</span></figure><div class="event-poster-content"><span class="event-poster-kicker">Upcoming event</span><h3>${escapeText(event.title)}</h3><dl class="event-poster-meta"><div><dt>Date</dt><dd>${escapeText(event.dateLabel)}</dd></div>${event.location ? `<div><dt>Location</dt><dd>${escapeText(event.location)}</dd></div>` : ''}</dl><p>${escapeText(event.summary)}</p><strong>Explore event <span aria-hidden="true">→</span></strong></div></a></article>`).join('');
+  const normalizePath = (path = '') => decodeURIComponent(path).replace(/\\/g, '/').toLowerCase();
+  const eventByImage = new Map(visibleEvents.map((event) => [normalizePath(event.image), event]));
+  const posterCards = posters.map((image) => {
+    const event = eventByImage.get(normalizePath(image));
+    if (event) return { ...event, href: eventUrl(event), external: false };
+    return {
+      title: 'Church Announcement',
+      dateLabel: 'View the poster for complete details',
+      image,
+      summary: 'A newly published update from Denver Tamil Church.',
+      href: image,
+      external: true
+    };
+  });
+  list.innerHTML = posterCards.map((event, index) => `<article class="event-poster-card" data-event-slide="${index}"><a href="${escapeText(event.href)}"${event.external ? ' target="_blank" rel="noopener noreferrer"' : ''}><figure><img src="${escapeText(event.image)}" alt="${escapeText(event.title)} poster" width="1672" height="941" loading="lazy" /><span class="event-poster-image-label">${event.external ? 'New update' : 'Featured event'}</span></figure><div class="event-poster-content"><span class="event-poster-kicker">Upcoming event</span><h3>${escapeText(event.title)}</h3><dl class="event-poster-meta"><div><dt>Details</dt><dd>${escapeText(event.dateLabel)}</dd></div>${event.location ? `<div><dt>Location</dt><dd>${escapeText(event.location)}</dd></div>` : ''}</dl><p>${escapeText(event.summary)}</p><strong>${event.external ? 'View full poster' : 'Explore event'} <span aria-hidden="true">→</span></strong></div></a></article>`).join('');
   list.tabIndex = 0;
   list.setAttribute('role', 'region');
   list.setAttribute('aria-label', 'Scrollable event posters');
@@ -105,17 +125,17 @@ const renderEventCards = (events) => {
     event.preventDefault();
     list.scrollBy({ left: event.deltaY, behavior: 'auto' });
   }, { passive: false });
-  if (visibleEvents.length > 1) {
+  if (posterCards.length > 1) {
     const carouselColumn = list.closest('.event-carousel-column');
     const controls = document.createElement('div');
     controls.className = 'event-poster-controls';
-    controls.innerHTML = `<span class="event-slide-count" aria-live="polite"><strong data-event-current>01</strong><span>/</span>${String(visibleEvents.length).padStart(2, '0')}</span><div class="event-poster-buttons"><button type="button" data-event-scroll="previous" aria-label="Show previous event poster"><span aria-hidden="true">←</span></button><button type="button" data-event-scroll="next" aria-label="Show next event poster"><span aria-hidden="true">→</span></button></div>`;
+    controls.innerHTML = `<span class="event-slide-count" aria-live="polite"><strong data-event-current>01</strong><span>/</span>${String(posterCards.length).padStart(2, '0')}</span><div class="event-poster-buttons"><button type="button" data-event-scroll="previous" aria-label="Show previous event poster"><span aria-hidden="true">←</span></button><button type="button" data-event-scroll="next" aria-label="Show next event poster"><span aria-hidden="true">→</span></button></div>`;
     carouselColumn?.append(controls);
     const currentSlide = controls.querySelector('[data-event-current]');
     const updateSlide = () => {
-      const index = Math.min(visibleEvents.length - 1, Math.max(0, Math.round(list.scrollLeft / Math.max(list.clientWidth, 1))));
+      const index = Math.min(posterCards.length - 1, Math.max(0, Math.round(list.scrollLeft / Math.max(list.clientWidth, 1))));
       currentSlide.textContent = String(index + 1).padStart(2, '0');
-      list.closest('.event-list-section')?.style.setProperty('--event-progress', `${((index + 1) / visibleEvents.length) * 100}%`);
+      list.closest('.event-list-section')?.style.setProperty('--event-progress', `${((index + 1) / posterCards.length) * 100}%`);
     };
     let scrollFrame;
     list.addEventListener('scroll', () => {
@@ -199,6 +219,6 @@ const renderEventDetail = (events) => {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-  try { const events = await loadEvents(); renderEventCards(events); renderEventAgenda(events); renderCalendar(events); renderEventDetail(events); }
+  try { const [events, posters] = await Promise.all([loadEvents(), loadEventPosters()]); renderEventCards(events, posters); renderEventAgenda(events); renderCalendar(events); renderEventDetail(events); }
   catch (error) { document.querySelectorAll('[data-event-list], [data-event-detail]').forEach((node) => { node.innerHTML = '<p>Event information is temporarily unavailable. Please contact the church for assistance.</p>'; }); }
 });
