@@ -473,7 +473,7 @@ const initSharedHeaderIdentity = () => {
       const widget = document.createElement('div');
       const panelId = `service-countdown-${Math.random().toString(36).slice(2, 8)}`;
       widget.className = 'header-service-countdown';
-      widget.innerHTML = `<button class="header-service-time" type="button" aria-expanded="false" aria-controls="${panelId}"><span class="service-time-line"><span class="lang" data-lang="en"><strong>Sunday Service</strong><i aria-hidden="true">|</i><small>4:30 PM</small></span><span class="lang" data-lang="ta"><strong>ஞாயிறு ஆராதனை</strong><i aria-hidden="true">|</i><small>மாலை 4:30</small></span><span class="service-countdown-chevron" aria-hidden="true"></span></span><span class="service-countdown-compact" aria-label="Time remaining until Sunday service"><b data-countdown-compact="days">00</b>D <i>:</i> <b data-countdown-compact="hours">00</b>H <i>:</i> <b data-countdown-compact="minutes">00</b>M <i>:</i> <b data-countdown-compact="seconds">00</b>S</span></button><span class="service-address-line"><strong>9052 W Ken Caryl Ave</strong><span>Littleton, CO 80128</span></span><div class="service-countdown-panel" id="${panelId}"><p>COUNTDOWN TO SUNDAY</p><strong class="service-countdown-next-date"></strong><div class="service-countdown-values"><span><strong data-countdown="days">00</strong><small>Day(s)</small></span><span><strong data-countdown="hours">00</strong><small>Hour(s)</small></span><span><strong data-countdown="minutes">00</strong><small>Minute(s)</small></span><span><strong data-countdown="seconds">00</strong><small>Second(s)</small></span></div><div class="service-countdown-details"><span><strong>Worship Service</strong> · Sundays at 4:30 PM</span><span>9052 W Ken Caryl Ave · Littleton, CO</span></div><div class="service-countdown-actions"><a href="live.html">Watch Live →</a><a href="contact.html">Plan Your Visit →</a></div></div>`;
+      widget.innerHTML = `<button class="header-service-time" type="button" aria-expanded="false" aria-controls="${panelId}"><span class="service-time-line"><span class="lang" data-lang="en"><strong>Sunday Service</strong><i aria-hidden="true">|</i><small>4:30 PM</small></span><span class="lang" data-lang="ta"><strong>ஞாயிறு ஆராதனை</strong><i aria-hidden="true">|</i><small>மாலை 4:30</small></span><span class="service-countdown-chevron" aria-hidden="true"></span></span><span class="service-countdown-compact" aria-label="Time remaining until Sunday service"><b data-countdown-compact="days">00</b>D <i>:</i> <b data-countdown-compact="hours">00</b>H <i>:</i> <b data-countdown-compact="minutes">00</b>M <i>:</i> <b data-countdown-compact="seconds">00</b>S</span></button><span class="service-address-line"><strong>9052 W Ken Caryl Ave</strong><span>Littleton, CO 80128</span></span><div class="service-countdown-panel" id="${panelId}"><p>COUNTDOWN TO SUNDAY</p><strong class="service-countdown-next-date"></strong><div class="service-countdown-values"><span><strong data-countdown="days">00</strong><small>Day(s)</small></span><span><strong data-countdown="hours">00</strong><small>Hour(s)</small></span><span><strong data-countdown="minutes">00</strong><small>Minute(s)</small></span><span><strong data-countdown="seconds">00</strong><small>Second(s)</small></span></div><div class="service-countdown-details"><span><strong>Worship Service</strong> · Sundays at 4:30 PM</span><span><strong>Full English:</strong> 3rd Sunday · <strong>Tamil:</strong> all other Sundays</span><span>9052 W Ken Caryl Ave · Littleton, CO</span></div><div class="service-countdown-actions"><a href="live.html">Watch Live →</a><a href="contact.html">Plan Your Visit →</a></div></div>`;
       brandCluster.append(widget);
 
       const toggle = widget.querySelector('.header-service-time');
@@ -1019,7 +1019,7 @@ const initChurchChat = () => {
     { phrases: ['communion service', 'first sunday communion'], priority: 10, answer: 'Communion Service is held on the first Sunday of each month as part of Sunday worship at 4:30 PM Mountain Time.', link: ['View Communion dates', 'events.html#event-calendar'] },
     { phrases: ['fasting prayer', 'fasting and prayer'], priority: 10, answer: 'Fasting and Prayer Service is held on the first Saturday of each month. Contact the church for the confirmed service time.', link: ['Ask about Fasting & Prayer', 'contact.html?subject=Prayer%20Request#contact-form'] },
     { phrases: ["god's promise service", 'gods promise service', 'promise service'], priority: 10, answer: 'God’s Promise Service is held at 6:00 AM on the first day of every month, with Scripture, worship, and prayer for the month ahead.', link: ['View the church calendar', 'events.html#event-calendar'] },
-    { phrases: ['sunday service', 'service time', 'worship time', 'what time', 'when is service', 'ஞாயிறு', 'ஆராதனை', 'நேரம்'], priority: 7, answer: 'Sunday worship begins at 4:30 PM Mountain Time. The primary gathering is a Tamil service with Kids Sunday School. Communion is on the first Sunday, and Teen & Adult Sunday Service is on the third Sunday.', link: ['Plan your visit', 'contact.html'] },
+    { phrases: ['sunday service', 'service time', 'worship time', 'what time', 'when is service', 'ஞாயிறு', 'ஆராதனை', 'நேரம்'], priority: 7, answer: 'Sunday worship begins at 4:30 PM Mountain Time. We have a full English service on the third Sunday of every month and a Tamil service on all other Sundays.', link: ['Plan your visit', 'contact.html'] },
     { phrases: ['christmas', 'easter', 'holy week', 'palm sunday', 'maundy thursday', 'good friday', 'holy saturday', 'ascension', 'pentecost', 'advent'], priority: 6, answer: 'The church calendar includes Palm Sunday, Holy Week, Easter, Ascension Day, Pentecost, Advent, Christmas Eve, and Christmas Day. Select an observance in the calendar for its date and complete details.', link: ['View Christian observances', 'events.html#event-calendar'] },
     { phrases: ['us holiday', 'federal holiday', 'memorial day', 'juneteenth', 'independence day', 'labor day', 'veterans day', 'thanksgiving'], priority: 6, answer: 'The calendar identifies major U.S. holidays separately from church events and Christian observances. Use the color legend to distinguish each category.', link: ['View the church calendar', 'events.html#event-calendar'] },
     { phrases: ['address', 'location', 'where is the church', 'directions', 'visit church', 'முகவரி', 'இடம்'], priority: 8, answer: 'Denver Tamil Church meets at 9052 W Ken Caryl Ave, Littleton, CO 80128. The website does not publish specific parking instructions; contact the church if you need accessibility or arrival assistance.', link: ['Get directions', 'https://www.google.com/maps/search/?api=1&query=9052+W+Ken+Caryl+Ave%2C+Littleton%2C+CO+80128'] },
@@ -1039,7 +1039,7 @@ const initChurchChat = () => {
     { phrases: ['gallery', 'photo', 'album', 'pictures', 'புகைப்படம்'], priority: 5, answer: 'The Gallery organizes church photos into event albums. Select an album to browse its available images using the viewer and navigation controls.', link: ['Open Gallery', 'gallery.html'] },
     { phrases: ['prayer request', 'pray for me', 'need prayer', 'ஜெபம்'], priority: 9, answer: 'We would be honored to pray with you. Choose “Prayer Request” in the contact form or email info@denvertamilchurch.com. For an urgent emergency, contact local emergency services; the website assistant cannot provide emergency help.', link: ['Send a prayer request', 'contact.html?subject=Prayer%20Request#contact-form'] },
     { phrases: ['phone number', 'call church', 'email address', 'contact information', 'reach church', 'தொடர்பு'], priority: 8, answer: 'Call Denver Tamil Church at (720) 819-5990 or email info@denvertamilchurch.com. You can also use the website contact form for general questions, ministry interest, prayer requests, pastoral contact, or visits.', link: ['Open the contact form', 'contact.html#contact-form'] },
-    { phrases: ['tamil service', 'english service', 'language', 'தமிழ்'], priority: 8, answer: 'The primary Sunday gathering is a Tamil service with Kids Sunday School. Teen & Adult Sunday Service is held every third Sunday. The website can be switched between English and Tamil using the EN/TA control.' },
+    { phrases: ['tamil service', 'english service', 'language', 'தமிழ்'], priority: 8, answer: 'We have a full English service on the third Sunday of every month. All other Sundays are Tamil services. The website can be switched between English and Tamil using the EN/TA control.' },
     { phrases: ['denomination', 'non denominational', 'independent church'], priority: 9, answer: 'Denver Tamil Church is an independent, non-denominational Christian community established in 2004 and rooted in the teachings of Jesus, the Apostles, and the New Testament church.', link: ['Learn who we are', 'index.html'] }
   ];
   const websitePages = [
@@ -1353,6 +1353,7 @@ const initDailyVerse = async () => {
   const notice = document.createElement('aside');
   notice.className = 'daily-verse-notice';
   notice.setAttribute('aria-label', 'Verse of the day');
+  notice.title = 'Drag anywhere on this card to move it';
   notice.innerHTML = `
     <button type="button" class="daily-verse-mark daily-verse-drag" aria-label="Move verse card" title="Drag to move · double-click to reset">&#10013;</button>
     <div class="daily-verse-copy">
@@ -1363,7 +1364,6 @@ const initDailyVerse = async () => {
     <button type="button" class="daily-verse-close" aria-label="Dismiss verse of the day">&times;</button>`;
   notice.querySelector('blockquote').textContent = `“${verse.text}”`;
   notice.querySelector('cite').textContent = verse.reference;
-  const dragHandle = notice.querySelector('.daily-verse-drag');
   const positionKey = 'dtcDailyVersePosition';
   const placeNotice = (left, top, save = false) => {
     const maxLeft = Math.max(8, window.innerWidth - notice.offsetWidth - 8);
@@ -1377,15 +1377,15 @@ const initDailyVerse = async () => {
     if (save) localStorage.setItem(positionKey, JSON.stringify({ left: nextLeft, top: nextTop }));
   };
   let dragState = null;
-  dragHandle.addEventListener('pointerdown', (event) => {
-    if (event.button !== 0) return;
+  notice.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0 || event.target.closest('.daily-verse-close')) return;
     const bounds = notice.getBoundingClientRect();
     dragState = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, left: bounds.left, top: bounds.top };
-    dragHandle.setPointerCapture(event.pointerId);
+    notice.setPointerCapture(event.pointerId);
     notice.classList.add('is-dragging');
     event.preventDefault();
   });
-  dragHandle.addEventListener('pointermove', (event) => {
+  notice.addEventListener('pointermove', (event) => {
     if (!dragState || event.pointerId !== dragState.pointerId) return;
     placeNotice(dragState.left + event.clientX - dragState.x, dragState.top + event.clientY - dragState.y);
   });
@@ -1396,9 +1396,10 @@ const initDailyVerse = async () => {
     notice.classList.remove('is-dragging');
     placeNotice(bounds.left, bounds.top, true);
   };
-  dragHandle.addEventListener('pointerup', finishDrag);
-  dragHandle.addEventListener('pointercancel', finishDrag);
-  dragHandle.addEventListener('dblclick', () => {
+  notice.addEventListener('pointerup', finishDrag);
+  notice.addEventListener('pointercancel', finishDrag);
+  notice.addEventListener('dblclick', (event) => {
+    if (event.target.closest('.daily-verse-close')) return;
     localStorage.removeItem(positionKey);
     notice.removeAttribute('style');
   });
