@@ -18,6 +18,8 @@ class Handler(SimpleHTTPRequestHandler):
             '/admin/admin.css',
             '/js/admin.js',
             '/js/script.js',
+            '/sermon-notes.html',
+            '/styles.css',
             '/api/upcoming-events',
             '/assets/upcoming/events.json',
             '/assets/upcoming/manifest.json',
