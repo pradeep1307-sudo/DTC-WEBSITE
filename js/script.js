@@ -363,6 +363,14 @@ const siteNavigation = [
   ] }
 ];
 
+const liveNavigation = siteNavigation.find((item) => item.page === 'live.html');
+if (liveNavigation) {
+  liveNavigation.children = [
+    { page: 'live.html', href: 'live.html', en: liveNavigation.en, ta: liveNavigation.ta },
+    { page: 'sermon-notes.html', href: 'sermon-notes.html', en: 'Sermon Notes', ta: 'பிரசங்கக் குறிப்புகள்' }
+  ];
+}
+
 const normalizeNavigation = () => {
   const currentPage = getPageKey();
   document.querySelectorAll('.nav-links').forEach((nav, index) => {

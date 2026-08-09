@@ -3221,6 +3221,49 @@ main::before {
   text-transform: uppercase;
 }
 
+/* Sermon Notes construction page. */
+.sermon-notes-page {
+  display: grid;
+  min-height: calc(100vh - 220px);
+  padding: clamp(42px, 8vw, 92px) 24px 72px;
+  place-items: center;
+}
+.sermon-notes-card {
+  width: min(760px, 100%);
+  padding: clamp(38px, 7vw, 72px) clamp(24px, 6vw, 64px);
+  border: 1px solid rgba(11, 95, 120, .14);
+  border-radius: 26px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .98), rgba(242, 249, 247, .96));
+  text-align: center;
+  box-shadow: 0 22px 55px rgba(20, 33, 61, .11);
+}
+.sermon-notes-icon {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 24px;
+  padding: 21px 18px;
+  gap: 7px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, var(--ink), var(--ocean));
+  box-shadow: 0 14px 28px rgba(11, 95, 120, .22);
+}
+.sermon-notes-icon span { height: 4px; border-radius: 999px; background: #f6cc84; }
+.sermon-notes-icon span:nth-child(2) { width: 78%; }
+.sermon-notes-card .eyebrow { margin-bottom: 10px; color: #a15b00; }
+.sermon-notes-card h1 {
+  margin-bottom: 16px;
+  color: var(--ink);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+.sermon-notes-message { max-width: 590px; margin: 0 auto 26px; color: var(--muted); font-size: 1.05rem; line-height: 1.7; }
+@media (max-width: 520px) {
+  .sermon-notes-page { padding: 28px 16px 52px; }
+  .sermon-notes-card { border-radius: 20px; }
+}
+
 /* Dedicated Live Stream page. */
 .live-page {
   max-width: 1120px;
