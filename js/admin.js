@@ -1,5 +1,9 @@
 const imageExtensions = /\.(jpe?g|png|webp)$/i;
-const state = { project: null, galleryDir: null, upcomingDir: null, backgroundsDir: null, pastorDir: null, albums: [], eventImages: [], eventsData: [], backgroundImage: null, backgroundImages: [], pastorImages: [], activeAlbum: null, objectUrls: [] };
+const mediaGroups = {
+  missions: { local: 'Local Mission', global: 'Global Missions', discipleship: 'Discipleship Ministries' },
+  ministries: { kids: 'Kids Ministry', youth: 'Teen & Young Adult', men: "Men's Ministry", women: "Women's Ministry" }
+};
+const state = { project: null, galleryDir: null, upcomingDir: null, backgroundsDir: null, pastorDir: null, collectionDirs: {}, collections: { missions: {}, ministries: {} }, albums: [], eventImages: [], eventsData: [], backgroundImage: null, backgroundImages: [], pastorImages: [], activeAlbum: null, objectUrls: [] };
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const statusNode = $('[data-admin-status]');
@@ -204,11 +208,13 @@ const loadPublishedMedia = async () => {
       return response.ok ? await response.json() : fallback;
     } catch { return fallback; }
   };
-  const [galleryManifest, eventManifest, backgroundManifest, pastorManifest] = await Promise.all([
+  const [galleryManifest, eventManifest, backgroundManifest, pastorManifest, missionManifest, ministryManifest] = await Promise.all([
     loadManifest('../assets/gallery/manifest.json', []),
     loadManifest('../assets/upcoming/manifest.json', []),
     loadManifest('../assets/backgrounds/manifest.json', {}),
-    loadManifest('../assets/pastor/manifest.json', [])
+    loadManifest('../assets/pastor/manifest.json', []),
+    loadManifest('../assets/missions/manifest.json', {}),
+    loadManifest('../assets/ministries/manifest.json', {})
   ]);
   if (state.project) return;
   try {
@@ -222,9 +228,13 @@ const loadPublishedMedia = async () => {
     state.backgroundImage = backgroundManifest?.homeHero ? publishedImage(backgroundManifest.homeHero) : null;
     state.backgroundImages = Array.isArray(backgroundManifest?.homeHeaderSlides) ? backgroundManifest.homeHeaderSlides.map(publishedImage) : [];
     state.pastorImages = Array.isArray(pastorManifest) ? pastorManifest.map(publishedImage) : [];
+    for (const type of ['missions', 'ministries']) {
+      const manifest = type === 'missions' ? missionManifest : ministryManifest;
+      for (const key of Object.keys(mediaGroups[type])) state.collections[type][key] = Array.isArray(manifest?.[key]) ? manifest[key].map(publishedImage) : [];
+    }
     state.activeAlbum = state.albums[0] || null;
     renderAlbums();
-    await Promise.all([renderGallery(), renderEvents(), renderBackground(), renderPastor()]);
+    await Promise.all([renderGallery(), renderEvents(), renderBackground(), renderPastor(), renderCollections('missions'), renderCollections('ministries')]);
     const posterCount = state.eventImages.length;
     setStatus('Existing media loaded', `${posterCount} event poster${posterCount === 1 ? '' : 's'} available · select the project folder to make changes.`, 'ready');
   } catch (error) {
@@ -250,6 +260,11 @@ const saveBackgroundManifest = async () => {
 const savePastorManifest = async () => {
   await writeJson(state.pastorDir, 'manifest.json', state.pastorImages.map((image) => encodePath('assets', 'pastor', image.name)));
 };
+const saveCollectionManifest = async (type) => {
+  const manifest = {};
+  for (const key of Object.keys(mediaGroups[type])) manifest[key] = state.collections[type][key].map((image) => encodePath('assets', type, key, image.name));
+  await writeJson(state.collectionDirs[type], 'manifest.json', manifest);
+};
 const loadMedia = async () => {
   clearObjectUrls();
   const assets = await state.project.getDirectoryHandle('assets');
@@ -257,6 +272,16 @@ const loadMedia = async () => {
   state.upcomingDir = await assets.getDirectoryHandle('upcoming', { create: true });
   state.backgroundsDir = await assets.getDirectoryHandle('backgrounds', { create: true });
   state.pastorDir = await assets.getDirectoryHandle('pastor', { create: true });
+  for (const type of ['missions', 'ministries']) {
+    state.collectionDirs[type] = await assets.getDirectoryHandle(type, { create: true });
+    const manifest = await readJson(state.collectionDirs[type], 'manifest.json') || {};
+    for (const key of Object.keys(mediaGroups[type])) {
+      const directory = await state.collectionDirs[type].getDirectoryHandle(key, { create: true });
+      const images = await imageEntries(directory);
+      if (Array.isArray(manifest[key])) applySavedOrder(images, manifest[key]);
+      state.collections[type][key] = images;
+    }
+  }
   const savedGallery = await readJson(state.galleryDir, 'manifest.json');
   const names = new Map(Array.isArray(savedGallery) ? savedGallery.map((album) => [album.slug, album]) : []);
   state.albums = [];
@@ -295,8 +320,8 @@ const loadMedia = async () => {
   const pastorManifest = await readJson(state.pastorDir, 'manifest.json');
   if (Array.isArray(pastorManifest)) applySavedOrder(state.pastorImages, pastorManifest);
   if (state.activeAlbum) state.activeAlbum = state.albums.find((album) => album.slug === state.activeAlbum.slug) || null;
-  await Promise.all([saveGalleryManifest(), saveEventManifest(), savePastorManifest()]);
-  renderAlbums(); renderGallery(); renderEvents(); renderBackground(); renderPastor();
+  await Promise.all([saveGalleryManifest(), saveEventManifest(), savePastorManifest(), saveCollectionManifest('missions'), saveCollectionManifest('ministries')]);
+  renderAlbums(); renderGallery(); renderEvents(); renderBackground(); renderPastor(); renderCollections('missions'); renderCollections('ministries');
 };
 
 const connectProject = async (project, remember = true) => {
@@ -371,11 +396,11 @@ const createPhotoCard = async (image, index, total, context) => {
   $('img', card).src = image.readOnly ? image.url : await previewUrl(image);
   $('img', card).loading = 'lazy';
   $('img', card).decoding = 'async';
-  $('img', card).alt = `${context === 'gallery' ? 'Gallery photo' : context === 'events' ? 'Event poster' : context === 'backgrounds' ? 'Homepage header background' : 'Pastor photo'} preview: ${image.name}`;
+  $('img', card).alt = `${context === 'gallery' ? 'Gallery photo' : context === 'events' ? 'Event poster' : context === 'backgrounds' ? 'Homepage header background' : context === 'pastor' ? 'Pastor photo' : 'Page carousel photo'} preview: ${image.name}`;
   $('.admin-photo-info strong', card).textContent = image.name;
   $('.admin-photo-info small', card).textContent = `${file ? `${formatBytes(file.size)} · ` : ''}${index + 1} of ${total}${image.readOnly ? ' · Preview' : ''}`;
   if (index === 0) card.classList.add('is-cover');
-  if (context === 'backgrounds' || context === 'pastor') {
+  if (context === 'backgrounds' || context === 'pastor' || context.includes(':')) {
     $('.admin-cover-badge', card).textContent = 'First slide';
     $('[data-action="cover"]', card).textContent = 'Make first';
   }
@@ -473,9 +498,42 @@ const renderPastor = async () => {
     setStatus('Pastor photo order updated', 'The homepage transition now follows this order.', 'ready');
   });
 };
+const renderCollections = async (type) => {
+  const manager = $(`[data-collection-manager="${type}"]`);
+  if (!manager) return;
+  manager.innerHTML = '';
+  for (const [key, label] of Object.entries(mediaGroups[type])) {
+    const images = state.collections[type][key] || [];
+    const section = document.createElement('section');
+    section.className = 'admin-collection';
+    section.innerHTML = `<div class="admin-collection-heading"><div><h3>${label}</h3><p>${images.length} photo${images.length === 1 ? '' : 's'} · automatic moving carousel</p></div><label class="admin-upload${state.project ? '' : ' is-disabled'}"><input type="file" accept="image/jpeg,image/png,image/webp" multiple data-collection-upload="${type}:${key}" ${state.project ? '' : 'disabled'}><span>Add Photos</span></label></div><div class="admin-photo-grid" data-collection-grid="${type}:${key}"></div>`;
+    manager.append(section);
+    const grid = $('[data-collection-grid]', section);
+    if (!images.length) grid.innerHTML = emptyState(`No ${label} photos yet.`, 'Add multiple photos to start the automatic carousel.', '◇');
+    else for (let index = 0; index < images.length; index += 1) grid.append(await createPhotoCard(images[index], index, images.length, `${type}:${key}`));
+    bindDragSorting(grid, `[data-sortable-photo="${type}:${key}"]`, async (from, to) => {
+      moveItem(images, from, to); await saveCollectionManifest(type); clearObjectUrls(); await renderCollections(type); notifyPublishedMedia(type); setStatus(`${label} order updated`, 'The public page now follows this image order.', 'ready');
+    });
+  }
+  $$('[data-collection-upload]', manager).forEach((input) => input.addEventListener('change', handleCollectionUpload));
+};
+const handleCollectionUpload = async (event) => {
+  const [type, key] = event.target.dataset.collectionUpload.split(':');
+  const files = [...event.target.files].filter((file) => imageExtensions.test(file.name));
+  if (!state.collectionDirs[type] || !files.length) return;
+  const directory = await state.collectionDirs[type].getDirectoryHandle(key, { create: true });
+  const updateProgress = beginUploadProgress(`Publishing ${mediaGroups[type][key]} photos`);
+  try {
+    const names = await copyFiles(directory, files, updateProgress);
+    for (const name of names) state.collections[type][key].push(await directory.getFileHandle(name));
+    await saveCollectionManifest(type); event.target.value = ''; clearObjectUrls(); await renderCollections(type); notifyPublishedMedia(type); finishUploadProgress('Carousel photos published'); setStatus('Photos added', `${mediaGroups[type][key]} now includes the new images.`, 'ready');
+  } catch { uploadProgress.hidden = true; setStatus('Photo upload failed', 'Check folder access and available disk space, then try again.', 'error'); }
+};
 const handlePhotoAction = async (context, image, action) => {
-  const collection = context === 'gallery' ? state.activeAlbum.images : context === 'events' ? state.eventImages : context === 'backgrounds' ? state.backgroundImages : state.pastorImages;
-  const directory = context === 'gallery' ? state.activeAlbum.handle : context === 'events' ? state.upcomingDir : context === 'backgrounds' ? state.backgroundsDir : state.pastorDir;
+  const [collectionType, collectionKey] = context.split(':');
+  const isCollection = Boolean(collectionKey);
+  const collection = isCollection ? state.collections[collectionType][collectionKey] : context === 'gallery' ? state.activeAlbum.images : context === 'events' ? state.eventImages : context === 'backgrounds' ? state.backgroundImages : state.pastorImages;
+  const directory = isCollection ? await state.collectionDirs[collectionType].getDirectoryHandle(collectionKey) : context === 'gallery' ? state.activeAlbum.handle : context === 'events' ? state.upcomingDir : context === 'backgrounds' ? state.backgroundsDir : state.pastorDir;
   const index = collection.findIndex((entry) => entry.name === image.name);
   if (action === 'delete') {
     if ((context === 'backgrounds' || context === 'pastor') && collection.length === 1) {
@@ -489,9 +547,9 @@ const handlePhotoAction = async (context, image, action) => {
     const target = action === 'cover' ? 0 : action === 'up' ? Math.max(0, index - 1) : Math.min(collection.length - 1, index + 1);
     collection.splice(index, 1); collection.splice(target, 0, image);
   }
-  await (context === 'gallery' ? saveGalleryManifest() : context === 'events' ? saveEventManifest() : context === 'backgrounds' ? saveBackgroundManifest() : savePastorManifest());
-  clearObjectUrls(); await (context === 'gallery' ? renderGallery() : context === 'events' ? renderEvents() : context === 'backgrounds' ? renderBackground() : renderPastor()); renderAlbums();
-  notifyPublishedMedia(context === 'gallery' ? 'gallery' : context === 'events' ? 'events' : context === 'backgrounds' ? 'background' : 'pastor');
+  await (isCollection ? saveCollectionManifest(collectionType) : context === 'gallery' ? saveGalleryManifest() : context === 'events' ? saveEventManifest() : context === 'backgrounds' ? saveBackgroundManifest() : savePastorManifest());
+  clearObjectUrls(); await (isCollection ? renderCollections(collectionType) : context === 'gallery' ? renderGallery() : context === 'events' ? renderEvents() : context === 'backgrounds' ? renderBackground() : renderPastor()); renderAlbums();
+  notifyPublishedMedia(isCollection ? collectionType : context === 'gallery' ? 'gallery' : context === 'events' ? 'events' : context === 'backgrounds' ? 'background' : 'pastor');
   setStatus('Changes saved locally', 'Review the public page before committing and pushing.', 'ready');
 };
 

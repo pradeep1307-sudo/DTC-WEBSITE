@@ -1656,3 +1656,14 @@ body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; 
   background: #cc1235 !important;
   color: #fff !important;
 }
+.mission-grid .mission-card::before { display: none; }
+.mission-card-media { position:relative; width:calc(100% + 40px); height:130px; margin:-22px -20px 18px; overflow:hidden; background-position:center; background-size:cover; }
+.mission-card:nth-child(1) .mission-card-media { background-image:linear-gradient(rgba(8,28,46,.1),rgba(8,28,46,.18)),url('assets/images/mission-local-generated.jpg'); }
+.mission-card:nth-child(2) .mission-card-media { background-image:linear-gradient(rgba(8,28,46,.08),rgba(8,28,46,.16)),url('assets/images/mission-global-generated.jpg'); }
+.mission-card:nth-child(3) .mission-card-media { background-image:linear-gradient(rgba(8,28,46,.06),rgba(8,28,46,.14)),url('assets/images/mission-discipleship-generated.jpg'); }
+[data-rotating-media] { position:relative; overflow:hidden; }
+.managed-media-slide { position:absolute; z-index:0; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transform:scale(1.035); transition:opacity .85s ease,transform 1.1s ease; }
+.managed-media-slide.is-active { opacity:1; transform:scale(1); }
+.ministry-dialog-visual > span { z-index:2; }
+@media(max-width:720px){.mission-card-media{width:calc(100% + 36px);margin:-18px -18px 16px;}}
+@media(prefers-reduced-motion:reduce){.managed-media-slide{transition:none;transform:none;}}

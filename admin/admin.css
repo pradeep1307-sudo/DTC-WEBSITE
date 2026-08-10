@@ -171,7 +171,13 @@ button,a { -webkit-tap-highlight-color:transparent; }
 .admin-status { min-height:42px; margin:8px 0; padding:8px 12px; }
 .admin-status strong { font-size:.78rem; }
 .admin-status small { font-size:.69rem; }
-.admin-tabs { position:sticky; top:70px; z-index:8; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); margin:10px 0 8px; padding:4px; overflow-x:auto; background:rgba(235,235,233,.96); box-shadow:0 7px 22px rgba(0,0,0,.07); backdrop-filter:blur(10px); }
+.admin-tabs { position:sticky; top:70px; z-index:8; display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); margin:10px 0 8px; padding:4px; overflow-x:auto; background:rgba(235,235,233,.96); box-shadow:0 7px 22px rgba(0,0,0,.07); backdrop-filter:blur(10px); }
+.admin-panel--collections { grid-template-columns:1fr; }
+.admin-media-collections { display:grid; gap:18px; }
+.admin-collection { padding:14px; border:1px solid var(--line); border-radius:12px; background:#f7f7f5; }
+.admin-collection-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:12px; }
+.admin-collection-heading h3 { margin:0 0 4px; font-size:1rem; }
+.admin-collection-heading p { margin:0; color:var(--muted); font-size:.72rem; }
 .admin-tabs button { min-height:40px; padding:8px 12px; font-size:.7rem; letter-spacing:.035em; }
 .admin-panel { min-height:410px; border-radius:14px; box-shadow:0 14px 38px rgba(0,0,0,.075); }
 .admin-sidebar,.admin-workspace { padding:15px; }

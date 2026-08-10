@@ -52,6 +52,8 @@
         <button type="button" role="tab" aria-selected="false" aria-controls="event-manager" id="event-tab" data-admin-tab="events">Upcoming Event Posters</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="background-manager" id="background-tab" data-admin-tab="backgrounds">Header Backgrounds</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="pastor-manager" id="pastor-tab" data-admin-tab="pastor">Pastor Photos</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="mission-manager" id="mission-tab" data-admin-tab="missions">Mission Photos</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="ministry-manager" id="ministry-tab" data-admin-tab="ministries">Ministry Photos</button>
       </div>
 
       <section class="admin-panel" id="gallery-manager" role="tabpanel" aria-labelledby="gallery-tab" data-admin-panel="gallery">
@@ -87,6 +89,14 @@
         </div>
       </section>
 
+      <section class="admin-panel admin-panel--collections" id="mission-manager" role="tabpanel" aria-labelledby="mission-tab" data-admin-panel="missions" hidden>
+        <div class="admin-workspace admin-workspace--wide"><div class="admin-workspace-heading"><div><p class="admin-eyebrow">MISSIONS PAGE</p><h2>Mission Photo Carousels</h2><p>Upload multiple photos for each mission area. Drag to reorder; the first photo appears first.</p></div></div><div class="admin-media-collections" data-collection-manager="missions"></div></div>
+      </section>
+
+      <section class="admin-panel admin-panel--collections" id="ministry-manager" role="tabpanel" aria-labelledby="ministry-tab" data-admin-panel="ministries" hidden>
+        <div class="admin-workspace admin-workspace--wide"><div class="admin-workspace-heading"><div><p class="admin-eyebrow">MINISTRIES PAGE</p><h2>Ministry Photo Carousels</h2><p>Upload multiple photos for each ministry. The same moving gallery is used on its card and detail window.</p></div></div><div class="admin-media-collections" data-collection-manager="ministries"></div></div>
+      </section>
+
     </main>
     <dialog class="admin-event-dialog" data-event-publish-dialog aria-labelledby="event-publish-title">
       <form class="admin-event-form" data-event-publish-form>
@@ -102,6 +112,6 @@
       </form>
     </dialog>
     <template id="admin-photo-template"><article class="admin-photo"><div class="admin-photo-preview"><img alt="" /><span class="admin-cover-badge">Cover</span></div><div class="admin-photo-info"><strong></strong><small></small></div><div class="admin-photo-actions"><button type="button" data-action="cover">Make cover</button><button type="button" data-action="up" aria-label="Move earlier">↑</button><button type="button" data-action="down" aria-label="Move later">↓</button><button class="admin-danger" type="button" data-action="delete">Delete</button></div></article></template>
-    <script src="../js/admin.js?v=20260805-professional-dashboard"></script>
+    <script src="../js/admin.js?v=20260810-mission-ministry-media"></script>
   </body>
 </html>

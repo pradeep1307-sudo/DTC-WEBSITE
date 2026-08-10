@@ -1574,3 +1574,41 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 initLanguage();
+const initializeManagedPageCarousels = async () => {
+  const ministryKeys = ['kids', 'youth', 'men', 'women'];
+  ministryKeys.forEach((key, index) => {
+    document.querySelector(`.ministry-card:nth-child(${index + 1}) .ministry-card-media`)?.setAttribute('data-rotating-media', `ministries:${key}`);
+    document.querySelector(`.ministry-dialog-visual--${key}`)?.setAttribute('data-rotating-media', `ministries:${key}`);
+  });
+  const targets = [...document.querySelectorAll('[data-rotating-media]')];
+  if (!targets.length) return;
+  const types = [...new Set(targets.map((target) => target.dataset.rotatingMedia.split(':')[0]))];
+  const manifests = {};
+  await Promise.all(types.map(async (type) => {
+    try { const response = await fetch(`assets/${type}/manifest.json?v=${Date.now()}`, { cache: 'no-store' }); manifests[type] = response.ok ? await response.json() : {}; }
+    catch { manifests[type] = {}; }
+  }));
+  targets.forEach((target) => {
+    const [type, key] = target.dataset.rotatingMedia.split(':');
+    const images = Array.isArray(manifests[type]?.[key]) ? manifests[type][key] : [];
+    if (!images.length) return;
+    const layers = images.map((src, index) => {
+      const image = document.createElement('img');
+      image.src = src;
+      image.loading = index === 0 ? 'eager' : 'lazy';
+      image.className = `managed-media-slide${index === 0 ? ' is-active' : ''}`;
+      image.alt = '';
+      image.setAttribute('aria-hidden', 'true');
+      target.prepend(image);
+      return image;
+    });
+    let current = 0;
+    if (images.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    window.setInterval(() => {
+      layers[current].classList.remove('is-active');
+      current = (current + 1) % images.length;
+      layers[current].classList.add('is-active');
+    }, 5200);
+  });
+};
+initializeManagedPageCarousels();
