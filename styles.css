@@ -5363,3 +5363,142 @@ li { line-height: 1.65; }
 .home-admin-link:hover svg,.home-admin-link:focus-visible svg { transform:rotate(90deg); }
 @media(max-width:620px){.home-admin-link{width:32px;height:32px}.home-admin-link svg{width:17px;height:17px}}
 @media(prefers-reduced-motion:reduce){.home-admin-link,.home-admin-link svg{transition:none}}
+
+/* Home-page shortcut to the Sermon Notes construction page. */
+.sermon-notes-preview {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 13px;
+  align-items: center;
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid rgba(17, 17, 17, .13);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff, #f3f3f3);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .07);
+}
+.sermon-notes-preview-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 12px;
+  background: #171717;
+  color: #fff;
+  font-size: 1rem;
+}
+.sermon-notes-preview-copy { min-width: 0; }
+.sermon-notes-preview-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 3px;
+  color: #8a5700;
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.sermon-notes-preview-dot { width: 7px; height: 7px; border-radius: 50%; background: #d39b3c; box-shadow: 0 0 0 4px rgba(211, 155, 60, .13); }
+.sermon-notes-preview h3 { margin: 0 0 3px; color: #171717; font-size: .95rem; }
+.sermon-notes-preview-copy > p:last-child { margin: 0; color: #5b5b5b; font-size: .79rem; line-height: 1.4; }
+.sermon-notes-preview-link {
+  display: inline-flex;
+  min-height: 36px;
+  padding: 8px 11px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: #171717;
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.sermon-notes-preview-link:hover { background: #cf1034; color: #fff; opacity: 1; }
+@media (max-width: 560px) {
+  .sermon-notes-preview { grid-template-columns: 38px minmax(0, 1fr); padding: 12px; }
+  .sermon-notes-preview-icon { width: 38px; height: 38px; border-radius: 10px; }
+  .sermon-notes-preview-link { grid-column: 1 / -1; width: 100%; }
+}
+
+/* Compact, app-like page density: heroes follow their content on every screen. */
+body { overflow-x: hidden; }
+.hero {
+  min-height: 0;
+  padding-bottom: 20px;
+}
+.hero .hero-content { margin-top: 116px; }
+.page-hero,
+.page-who .page-hero,
+.missions-hero-panel,
+.give-hero-panel,
+.contact-hero-panel,
+.live-hero-panel,
+.gallery-hero-panel {
+  margin-bottom: 10px;
+  padding: 9px 20px;
+  border-radius: 16px;
+}
+.page-hero h1,
+.page-who .page-hero h1,
+.missions-hero-panel h1,
+.give-hero-panel h1,
+.contact-hero-panel h1,
+.live-hero-panel h1,
+.gallery-hero-panel h1 {
+  margin-bottom: 2px;
+  font-size: clamp(1.5rem, 2.45vw, 2.05rem);
+}
+.page-hero p,
+.page-who .page-hero p,
+.missions-hero-panel p,
+.contact-hero-panel p,
+.give-hero-panel blockquote,
+.live-hero-panel > p:last-child,
+.gallery-hero-panel > p:last-child {
+  font-size: .82rem;
+  line-height: 1.32;
+}
+@media (max-width: 720px) {
+  .hero { padding-bottom: 18px; }
+  .hero .hero-content { margin-top: 116px; }
+  .hero h1 { font-size: clamp(2.15rem, 10vw, 2.75rem); }
+  .hero .hero-text { margin-bottom: 12px; font-size: .94rem; }
+  .hero .hero-verse { margin-bottom: 10px; padding-block: 8px 6px; font-size: .8rem; }
+  .hero .hero-actions { gap: 9px; }
+  .hero .hero-actions .btn { min-height: 42px; padding: 10px 14px; font-size: .82rem; }
+  .page-hero,
+  .page-who .page-hero,
+  .missions-hero-panel,
+  .give-hero-panel,
+  .contact-hero-panel,
+  .live-hero-panel,
+  .gallery-hero-panel {
+    margin-bottom: 8px;
+    padding: 8px 15px;
+    border-radius: 14px;
+  }
+  .page-hero h1,
+  .page-who .page-hero h1,
+  .missions-hero-panel h1,
+  .give-hero-panel h1,
+  .contact-hero-panel h1,
+  .live-hero-panel h1,
+  .gallery-hero-panel h1 { font-size: clamp(1.35rem, 6.8vw, 1.75rem); }
+  .page-hero p,
+  .page-who .page-hero p,
+  .missions-hero-panel p,
+  .contact-hero-panel p,
+  .give-hero-panel blockquote,
+  .live-hero-panel > p:last-child,
+  .gallery-hero-panel > p:last-child { font-size: .76rem; }
+  .section { padding-block: 24px; }
+  .give-page,
+  .missions-page,
+  .contact-page,
+  .live-page,
+  .gallery-page { padding: 12px 14px 34px; }
+  .page-section { padding-inline: 14px; }
+}

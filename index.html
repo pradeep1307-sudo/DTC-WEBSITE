@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>document.documentElement.classList.add('js-preparing');setTimeout(()=>document.documentElement.classList.remove('js-preparing'),2500);</script><style>html.js-preparing body{visibility:hidden}</style>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Denver Tamil Church</title>
@@ -15,8 +16,8 @@
       rel="stylesheet"
     />
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="design-system.css" />
+    <link rel="stylesheet" href="styles.css?v=20260809-4" />
+    <link rel="stylesheet" href="design-system.css?v=20260809-refresh-stable" />
     <noscript><style>body.home-preparing { opacity: 1; }</style></noscript>
   </head>
   <body class="home-preparing">
@@ -34,7 +35,7 @@
             <a class="home-admin-link" href="admin/" aria-label="Open website administration" title="Website administration"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94a7.8 7.8 0 0 0 .05-.94 7.8 7.8 0 0 0-.05-.94l2.03-1.58-1.92-3.32-2.39.96a7.3 7.3 0 0 0-1.63-.95L14.87 3h-3.84l-.36 3.17c-.58.24-1.12.56-1.63.95l-2.39-.96-1.92 3.32 2.03 1.58a7.8 7.8 0 0 0-.05.94c0 .32.02.63.05.94l-2.03 1.58 1.92 3.32 2.39-.96c.5.39 1.05.71 1.63.95l.36 3.17h3.84l.36-3.17a7.3 7.3 0 0 0 1.63-.95l2.39.96 1.92-3.32-2.03-1.58ZM12.95 15.5A3.5 3.5 0 1 1 12.95 8a3.5 3.5 0 0 1 0 7.5Z" fill="currentColor"/></svg></a>
         </div>
       </div>
-      <nav class="navbar">
+      <nav class="navbar" aria-label="Main navigation">
         <div class="nav-links">
           <a class="nav-link nav-link--active" href="index.html"><span class="lang" data-lang="en">Who We Are</span><span class="lang" data-lang="ta">நாங்கள் யார்</span></a>
           <a class="nav-link" href="missions.html"><span class="lang" data-lang="en">Missions and Ministries</span><span class="lang" data-lang="ta">மிஷன்கள் மற்றும் அமைச்சுகள்</span></a>
@@ -126,6 +127,15 @@
             </div>
           </div>
         </div>
+        <aside class="sermon-notes-preview" aria-label="Sermon Notes coming soon">
+          <span class="sermon-notes-preview-icon" aria-hidden="true">✦</span>
+          <div class="sermon-notes-preview-copy">
+            <p class="sermon-notes-preview-status"><span class="sermon-notes-preview-dot" aria-hidden="true"></span><span class="lang" data-lang="en">Coming Soon</span><span class="lang" data-lang="ta">விரைவில் வருகிறது</span></p>
+            <h3><span class="lang" data-lang="en">Sermon Notes</span><span class="lang" data-lang="ta">பிரசங்கக் குறிப்புகள்</span></h3>
+            <p><span class="lang" data-lang="en">Weekly sermon notes are being prepared. This page is under construction.</span><span class="lang" data-lang="ta">வாராந்திர பிரசங்கக் குறிப்புகள் தயாராகி வருகின்றன. இந்தப் பக்கம் உருவாக்கத்தில் உள்ளது.</span></p>
+          </div>
+          <a class="sermon-notes-preview-link" href="sermon-notes.html?v=20260809"><span class="lang" data-lang="en">View Notes →</span><span class="lang" data-lang="ta">குறிப்புகளைப் பார்க்கவும் →</span></a>
+        </aside>
       </section>
       <section class="quick-info" aria-label="Church quick information">
         <article class="quick-info-card">
@@ -284,6 +294,6 @@
         <p>@2004 DENVER TAMIL CHURCH</p>
       </div>
     </footer>
-    <script src="js/script.js?v=20260805-home-admin-link"></script>
+    <script src="js/script.js?v=20260809-refresh-stable"></script>
   </body>
 </html>

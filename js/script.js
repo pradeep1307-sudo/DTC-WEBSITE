@@ -517,7 +517,13 @@ const initSharedHeaderIdentity = () => {
       });
       header.append(socialGroup);
     }
-    if (languageControl) header.append(languageControl);
+    if (languageControl) {
+      languageControl.classList.remove('menu-language-toggle');
+      languageControl.classList.add('header-language-toggle');
+      const socialGroup = header.querySelector('.header-social-links');
+      if (socialGroup) header.insertBefore(languageControl, socialGroup);
+      else header.append(languageControl);
+    }
   });
 
   const zonedParts = (date) => Object.fromEntries(new Intl.DateTimeFormat('en-US', {
@@ -714,13 +720,19 @@ const initPreviousServices = async () => {
   try {
     const response = await fetch('/api/youtube-videos', { cache: 'no-store' });
     if (!response.ok) throw new Error('Video feed unavailable');
-    const currentVideoId = document.querySelector('.live-embed iframe')?.src.match(/\/embed\/([^?]+)/)?.[1];
-    const videos = (await response.json()).filter((video) => video.id !== currentVideoId);
-    if (!Array.isArray(videos) || !videos.length) throw new Error('No recent videos');
+    const videos = await response.json();
+    if (!Array.isArray(videos) || videos.length < 2) throw new Error('No recent videos');
+    const latest = videos[0];
+    const liveFrame = document.querySelector('.live-embed iframe');
+    if (liveFrame) {
+      liveFrame.src = `https://www.youtube.com/embed/${latest.id}`;
+      liveFrame.title = latest.title;
+    }
+    const previousVideos = videos.slice(1, 9);
     const formatter = new Intl.DateTimeFormat(document.documentElement.lang === 'ta' ? 'ta-IN' : 'en-US', {
       month: 'short', day: 'numeric', year: 'numeric'
     });
-    track.innerHTML = videos.map((video) => `
+    track.innerHTML = previousVideos.map((video) => `
       <article class="previous-service-card">
         <a href="${video.url}" target="_blank" rel="noopener noreferrer">
           <span class="previous-service-image">
@@ -1537,6 +1549,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.body.classList.add('is-loaded');
   document.body.classList.remove('home-preparing');
   document.body.style.opacity = '1';
+  document.documentElement.classList.remove('js-preparing');
 
   document.querySelectorAll('a[href]').forEach((link) => {
     if (link.target || link.href.startsWith('mailto:') || link.href.startsWith('tel:')) {
