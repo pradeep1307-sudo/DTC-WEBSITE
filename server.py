@@ -74,7 +74,8 @@ class Handler(SimpleHTTPRequestHandler):
             '/assets/backgrounds/manifest.json',
             '/assets/pastor/manifest.json',
             '/assets/missions/manifest.json',
-            '/assets/ministries/manifest.json'
+            '/assets/ministries/manifest.json',
+            '/assets/quick-info/manifest.json'
         }:
             self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             self.send_header('Pragma', 'no-cache')

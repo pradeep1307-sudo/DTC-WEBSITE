@@ -1,13 +1,37 @@
 const imageExtensions = /\.(jpe?g|png|webp)$/i;
 const mediaGroups = {
   missions: { local: 'Local Mission', global: 'Global Missions', discipleship: 'Discipleship Ministries' },
-  ministries: { kids: 'Kids Ministry', youth: 'Teen & Young Adult', men: "Men's Ministry", women: "Women's Ministry" }
+  ministries: { kids: 'Kids Ministry', youth: 'Teen & Young Adult', men: "Men's Ministry", women: "Women's Ministry" },
+  'quick-info': { worship: 'Sunday Worship', location: 'Location', call: 'Call Us' }
 };
-const state = { project: null, galleryDir: null, upcomingDir: null, backgroundsDir: null, pastorDir: null, collectionDirs: {}, collections: { missions: {}, ministries: {} }, albums: [], eventImages: [], eventsData: [], backgroundImage: null, backgroundImages: [], pastorImages: [], activeAlbum: null, objectUrls: [] };
+const collectionTypes = Object.keys(mediaGroups);
+const state = { project: null, galleryDir: null, upcomingDir: null, backgroundsDir: null, pastorDir: null, collectionDirs: {}, collections: { missions: {}, ministries: {}, 'quick-info': {} }, activeCollection: { missions: 'local', ministries: 'kids' }, activeQuickInfo: 'worship', albums: [], eventImages: [], eventsData: [], backgroundImage: null, backgroundImages: [], pastorImages: [], activeAlbum: null, objectUrls: [] };
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const statusNode = $('[data-admin-status]');
 const projectButton = $('[data-select-project]');
+const confirmDialog = $('[data-confirm-dialog]');
+let resolveConfirmation = null;
+const finishConfirmation = (confirmed) => {
+  if (!resolveConfirmation) return;
+  const resolve = resolveConfirmation;
+  resolveConfirmation = null;
+  if (confirmDialog.open) confirmDialog.close();
+  resolve(confirmed);
+};
+const confirmDeletion = (title, message) => new Promise((resolve) => {
+  if (!confirmDialog) { resolve(window.confirm(`${title}\n\n${message}`)); return; }
+  if (resolveConfirmation) finishConfirmation(false);
+  resolveConfirmation = resolve;
+  $('[data-confirm-title]').textContent = title;
+  $('[data-confirm-message]').textContent = message;
+  confirmDialog.showModal();
+  $('[data-confirm-delete]').focus();
+});
+$('[data-confirm-cancel]')?.addEventListener('click', () => finishConfirmation(false));
+$('[data-confirm-delete]')?.addEventListener('click', () => finishConfirmation(true));
+confirmDialog?.addEventListener('cancel', (event) => { event.preventDefault(); finishConfirmation(false); });
+confirmDialog?.addEventListener('click', (event) => { if (event.target === confirmDialog) finishConfirmation(false); });
 const adminDatabaseName = 'dtc-media-manager';
 const adminStoreName = 'settings';
 
@@ -196,6 +220,7 @@ const previewUrl = async (handle) => { const url = URL.createObjectURL(await han
 const formatBytes = (bytes) => bytes < 1048576 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1048576).toFixed(1)} MB`;
 const publishedImage = (path) => ({
   name: decodeURIComponent(path).split('/').pop(),
+  path,
   url: new URL(`../${path}`, window.location.href).href,
   readOnly: true
 });
@@ -208,13 +233,14 @@ const loadPublishedMedia = async () => {
       return response.ok ? await response.json() : fallback;
     } catch { return fallback; }
   };
-  const [galleryManifest, eventManifest, backgroundManifest, pastorManifest, missionManifest, ministryManifest] = await Promise.all([
+  const [galleryManifest, eventManifest, backgroundManifest, pastorManifest, missionManifest, ministryManifest, quickInfoManifest] = await Promise.all([
     loadManifest('../assets/gallery/manifest.json', []),
     loadManifest('../assets/upcoming/manifest.json', []),
     loadManifest('../assets/backgrounds/manifest.json', {}),
     loadManifest('../assets/pastor/manifest.json', []),
     loadManifest('../assets/missions/manifest.json', {}),
-    loadManifest('../assets/ministries/manifest.json', {})
+    loadManifest('../assets/ministries/manifest.json', {}),
+    loadManifest('../assets/quick-info/manifest.json', {})
   ]);
   if (state.project) return;
   try {
@@ -228,13 +254,13 @@ const loadPublishedMedia = async () => {
     state.backgroundImage = backgroundManifest?.homeHero ? publishedImage(backgroundManifest.homeHero) : null;
     state.backgroundImages = Array.isArray(backgroundManifest?.homeHeaderSlides) ? backgroundManifest.homeHeaderSlides.map(publishedImage) : [];
     state.pastorImages = Array.isArray(pastorManifest) ? pastorManifest.map(publishedImage) : [];
-    for (const type of ['missions', 'ministries']) {
-      const manifest = type === 'missions' ? missionManifest : ministryManifest;
+    for (const type of collectionTypes) {
+      const manifest = type === 'missions' ? missionManifest : type === 'ministries' ? ministryManifest : quickInfoManifest;
       for (const key of Object.keys(mediaGroups[type])) state.collections[type][key] = Array.isArray(manifest?.[key]) ? manifest[key].map(publishedImage) : [];
     }
     state.activeAlbum = state.albums[0] || null;
     renderAlbums();
-    await Promise.all([renderGallery(), renderEvents(), renderBackground(), renderPastor(), renderCollections('missions'), renderCollections('ministries')]);
+    await Promise.all([renderGallery(), renderEvents(), renderBackground(), renderPastor(), ...collectionTypes.map(renderCollections)]);
     const posterCount = state.eventImages.length;
     setStatus('Existing media loaded', `${posterCount} event poster${posterCount === 1 ? '' : 's'} available · select the project folder to make changes.`, 'ready');
   } catch (error) {
@@ -262,7 +288,7 @@ const savePastorManifest = async () => {
 };
 const saveCollectionManifest = async (type) => {
   const manifest = {};
-  for (const key of Object.keys(mediaGroups[type])) manifest[key] = state.collections[type][key].map((image) => encodePath('assets', type, key, image.name));
+  for (const key of Object.keys(mediaGroups[type])) manifest[key] = state.collections[type][key].map((image) => image.path || encodePath('assets', type, key, image.name));
   await writeJson(state.collectionDirs[type], 'manifest.json', manifest);
 };
 const loadMedia = async () => {
@@ -272,12 +298,15 @@ const loadMedia = async () => {
   state.upcomingDir = await assets.getDirectoryHandle('upcoming', { create: true });
   state.backgroundsDir = await assets.getDirectoryHandle('backgrounds', { create: true });
   state.pastorDir = await assets.getDirectoryHandle('pastor', { create: true });
-  for (const type of ['missions', 'ministries']) {
+  for (const type of collectionTypes) {
     state.collectionDirs[type] = await assets.getDirectoryHandle(type, { create: true });
     const manifest = await readJson(state.collectionDirs[type], 'manifest.json') || {};
     for (const key of Object.keys(mediaGroups[type])) {
       const directory = await state.collectionDirs[type].getDirectoryHandle(key, { create: true });
       const images = await imageEntries(directory);
+      const localNames = new Set(images.map((image) => image.name));
+      const externalImages = Array.isArray(manifest[key]) ? manifest[key].filter((path) => !localNames.has(decodeURIComponent(path).split('/').pop())).map(publishedImage) : [];
+      images.push(...externalImages);
       if (Array.isArray(manifest[key])) applySavedOrder(images, manifest[key]);
       state.collections[type][key] = images;
     }
@@ -320,8 +349,8 @@ const loadMedia = async () => {
   const pastorManifest = await readJson(state.pastorDir, 'manifest.json');
   if (Array.isArray(pastorManifest)) applySavedOrder(state.pastorImages, pastorManifest);
   if (state.activeAlbum) state.activeAlbum = state.albums.find((album) => album.slug === state.activeAlbum.slug) || null;
-  await Promise.all([saveGalleryManifest(), saveEventManifest(), savePastorManifest(), saveCollectionManifest('missions'), saveCollectionManifest('ministries')]);
-  renderAlbums(); renderGallery(); renderEvents(); renderBackground(); renderPastor(); renderCollections('missions'); renderCollections('ministries');
+  await Promise.all([saveGalleryManifest(), saveEventManifest(), savePastorManifest(), ...collectionTypes.map(saveCollectionManifest)]);
+  renderAlbums(); renderGallery(); renderEvents(); renderBackground(); renderPastor(); collectionTypes.forEach(renderCollections);
 };
 
 const connectProject = async (project, remember = true) => {
@@ -373,7 +402,7 @@ const deleteAlbum = async (slug) => {
   }
   const photoCount = album.images.length;
   const message = `Delete “${album.name}” and ${photoCount} photo${photoCount === 1 ? '' : 's'}? This permanently removes the album folder and cannot be undone.`;
-  if (!window.confirm(message)) return;
+  if (!await confirmDeletion(`Delete ${album.name}?`, message)) return;
   try {
     await state.galleryDir.removeEntry(album.slug, { recursive: true });
     state.albums = state.albums.filter((item) => item.slug !== slug);
@@ -405,8 +434,9 @@ const createPhotoCard = async (image, index, total, context) => {
     $('[data-action="cover"]', card).textContent = 'Make first';
   }
   const actions = $('.admin-photo-actions', card);
-  actions.hidden = image.readOnly;
-  if (!image.readOnly) {
+  const canEdit = Boolean(state.project && (!image.readOnly || context.includes(':')));
+  actions.hidden = !canEdit;
+  if (canEdit) {
     $('[data-action="cover"]', card).hidden = index === 0;
     $('[data-action="up"]', card).disabled = index === 0;
     $('[data-action="down"]', card).disabled = index === total - 1;
@@ -499,29 +529,56 @@ const renderPastor = async () => {
   });
 };
 const renderCollections = async (type) => {
-  const manager = $(`[data-collection-manager="${type}"]`);
-  if (!manager) return;
-  manager.innerHTML = '';
-  for (const [key, label] of Object.entries(mediaGroups[type])) {
-    const images = state.collections[type][key] || [];
-    const section = document.createElement('section');
-    section.className = 'admin-collection';
-    section.innerHTML = `<div class="admin-collection-heading"><div><h3>${label}</h3><p>${images.length} photo${images.length === 1 ? '' : 's'} · automatic moving carousel</p></div><label class="admin-upload${state.project ? '' : ' is-disabled'}"><input type="file" accept="image/jpeg,image/png,image/webp" multiple data-collection-upload="${type}:${key}" ${state.project ? '' : 'disabled'}><span>Add Photos</span></label></div><div class="admin-photo-grid" data-collection-grid="${type}:${key}"></div>`;
-    manager.append(section);
-    const grid = $('[data-collection-grid]', section);
-    if (!images.length) grid.innerHTML = emptyState(`No ${label} photos yet.`, 'Add multiple photos to start the automatic carousel.', '◇');
-    else for (let index = 0; index < images.length; index += 1) grid.append(await createPhotoCard(images[index], index, images.length, `${type}:${key}`));
-    bindDragSorting(grid, `[data-sortable-photo="${type}:${key}"]`, async (from, to) => {
-      moveItem(images, from, to); await saveCollectionManifest(type); clearObjectUrls(); await renderCollections(type); notifyPublishedMedia(type); setStatus(`${label} order updated`, 'The public page now follows this image order.', 'ready');
-    });
-  }
-  $$('[data-collection-upload]', manager).forEach((input) => input.addEventListener('change', handleCollectionUpload));
+  if (type === 'quick-info') { await renderQuickInfoManager(); return; }
+  const list = $(`[data-collection-list="${type}"]`);
+  const grid = $(`[data-selected-collection-grid="${type}"]`);
+  const input = $(`[data-selected-collection-upload="${type}"]`);
+  if (!list || !grid || !input) return;
+  const key = state.activeCollection[type];
+  const images = state.collections[type][key] || [];
+  list.innerHTML = Object.entries(mediaGroups[type]).map(([itemKey, label]) => `<button class="admin-album-button${itemKey === key ? ' is-active' : ''}" type="button" data-collection-key="${type}:${itemKey}"><strong>${label}</strong><span>${state.collections[type][itemKey]?.length || 0} photo${state.collections[type][itemKey]?.length === 1 ? '' : 's'}</span></button>`).join('');
+  $$('[data-collection-key]', list).forEach((button) => button.addEventListener('click', () => { state.activeCollection[type] = button.dataset.collectionKey.split(':')[1]; renderCollections(type); }));
+  $(`[data-collection-title="${type}"]`).textContent = mediaGroups[type][key];
+  $(`[data-collection-summary="${type}"]`).textContent = `${images.length} photo${images.length === 1 ? '' : 's'} · drag to reorder · first image appears first`;
+  input.disabled = !state.project;
+  input.dataset.collectionUpload = `${type}:${key}`;
+  input.closest('.admin-upload').classList.toggle('is-disabled', !state.project);
+  input.onchange = handleCollectionUpload;
+  grid.innerHTML = '';
+  if (!images.length) grid.innerHTML = emptyState(`No ${mediaGroups[type][key]} photos yet.`, 'Add multiple photos to start the automatic carousel.', '◇');
+  else for (let index = 0; index < images.length; index += 1) grid.append(await createPhotoCard(images[index], index, images.length, `${type}:${key}`));
+  bindDragSorting(grid, `[data-sortable-photo="${type}:${key}"]`, async (from, to) => {
+    moveItem(images, from, to); await saveCollectionManifest(type); clearObjectUrls(); await renderCollections(type); notifyPublishedMedia(type); setStatus(`${mediaGroups[type][key]} order updated`, 'The public page now follows this image order.', 'ready');
+  });
+};
+const renderQuickInfoManager = async () => {
+  const list = $('[data-quick-info-list]');
+  const grid = $('[data-quick-info-grid]');
+  const input = $('[data-quick-info-upload]');
+  if (!list || !grid || !input) return;
+  const key = state.activeQuickInfo;
+  const images = state.collections['quick-info'][key] || [];
+  list.innerHTML = Object.entries(mediaGroups['quick-info']).map(([itemKey, label]) => `<button class="admin-album-button${itemKey === key ? ' is-active' : ''}" type="button" data-quick-info-key="${itemKey}"><strong>${label}</strong><span>${state.collections['quick-info'][itemKey]?.length || 0} photo${state.collections['quick-info'][itemKey]?.length === 1 ? '' : 's'}</span></button>`).join('');
+  $$('[data-quick-info-key]', list).forEach((button) => button.addEventListener('click', () => { state.activeQuickInfo = button.dataset.quickInfoKey; renderQuickInfoManager(); }));
+  $('[data-quick-info-title]').textContent = mediaGroups['quick-info'][key];
+  $('[data-quick-info-summary]').textContent = `${images.length} photo${images.length === 1 ? '' : 's'} · drag to reorder · first image appears first`;
+  input.disabled = !state.project;
+  input.dataset.collectionUpload = `quick-info:${key}`;
+  input.closest('.admin-upload').classList.toggle('is-disabled', !state.project);
+  input.onchange = handleCollectionUpload;
+  grid.innerHTML = '';
+  if (!images.length) grid.innerHTML = emptyState('No photos are published.', 'Add multiple photos to start the automatic carousel.', '◇');
+  else for (let index = 0; index < images.length; index += 1) grid.append(await createPhotoCard(images[index], index, images.length, `quick-info:${key}`));
+  bindDragSorting(grid, '[data-sortable-photo="quick-info:' + key + '"]', async (from, to) => {
+    moveItem(images, from, to); await saveCollectionManifest('quick-info'); clearObjectUrls(); await renderQuickInfoManager(); notifyPublishedMedia('quick-info'); setStatus('Card photo order updated', 'The homepage now follows this image order.', 'ready');
+  });
 };
 const handleCollectionUpload = async (event) => {
   const [type, key] = event.target.dataset.collectionUpload.split(':');
   const files = [...event.target.files].filter((file) => imageExtensions.test(file.name));
   if (!state.collectionDirs[type] || !files.length) return;
   const directory = await state.collectionDirs[type].getDirectoryHandle(key, { create: true });
+  setStatus('Adding photos…', 'Upload progress is shown below.');
   const updateProgress = beginUploadProgress(`Publishing ${mediaGroups[type][key]} photos`);
   try {
     const names = await copyFiles(directory, files, updateProgress);
@@ -530,19 +587,25 @@ const handleCollectionUpload = async (event) => {
   } catch { uploadProgress.hidden = true; setStatus('Photo upload failed', 'Check folder access and available disk space, then try again.', 'error'); }
 };
 const handlePhotoAction = async (context, image, action) => {
+  try {
   const [collectionType, collectionKey] = context.split(':');
   const isCollection = Boolean(collectionKey);
   const collection = isCollection ? state.collections[collectionType][collectionKey] : context === 'gallery' ? state.activeAlbum.images : context === 'events' ? state.eventImages : context === 'backgrounds' ? state.backgroundImages : state.pastorImages;
   const directory = isCollection ? await state.collectionDirs[collectionType].getDirectoryHandle(collectionKey) : context === 'gallery' ? state.activeAlbum.handle : context === 'events' ? state.upcomingDir : context === 'backgrounds' ? state.backgroundsDir : state.pastorDir;
-  const index = collection.findIndex((entry) => entry.name === image.name);
+  const index = collection.findIndex((entry) => entry === image);
+  if (index < 0) { setStatus('Image not found', 'Reload the admin page and try again.', 'error'); return; }
   if (action === 'delete') {
-    if ((context === 'backgrounds' || context === 'pastor') && collection.length === 1) {
+    if ((context === 'backgrounds' || context === 'pastor' || isCollection) && collection.length === 1) {
       setStatus('Keep at least one image', 'Add a replacement photo before deleting the final slide.', 'error');
       return;
     }
-    if (!confirm(`Delete “${image.name}” from this website? This cannot be undone.`)) return;
-    await directory.removeEntry(image.name);
+    if (!await confirmDeletion(`Delete ${image.name}?`, 'This image will be removed from the website. This action cannot be undone.')) return;
+    if (!image.readOnly) await directory.removeEntry(image.name);
     collection.splice(index, 1);
+    if (context === 'events') {
+      state.eventsData = state.eventsData.filter((event) => decodeURIComponent(event.image || '').split('/').pop() !== image.name);
+      await writeJson(state.upcomingDir, 'events.json', state.eventsData);
+    }
   } else {
     const target = action === 'cover' ? 0 : action === 'up' ? Math.max(0, index - 1) : Math.min(collection.length - 1, index + 1);
     collection.splice(index, 1); collection.splice(target, 0, image);
@@ -551,6 +614,9 @@ const handlePhotoAction = async (context, image, action) => {
   clearObjectUrls(); await (isCollection ? renderCollections(collectionType) : context === 'gallery' ? renderGallery() : context === 'events' ? renderEvents() : context === 'backgrounds' ? renderBackground() : renderPastor()); renderAlbums();
   notifyPublishedMedia(isCollection ? collectionType : context === 'gallery' ? 'gallery' : context === 'events' ? 'events' : context === 'backgrounds' ? 'background' : 'pastor');
   setStatus('Changes saved locally', 'Review the public page before committing and pushing.', 'ready');
+  } catch (error) {
+    setStatus('Change could not be saved', error?.message || 'Check project access and try again.', 'error');
+  }
 };
 
 projectButton.addEventListener('click', async () => {

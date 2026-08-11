@@ -1580,6 +1580,16 @@ const initializeManagedPageCarousels = async () => {
     document.querySelector(`.ministry-card:nth-child(${index + 1}) .ministry-card-media`)?.setAttribute('data-rotating-media', `ministries:${key}`);
     document.querySelector(`.ministry-dialog-visual--${key}`)?.setAttribute('data-rotating-media', `ministries:${key}`);
   });
+  ['worship', 'location', 'call'].forEach((key, index) => {
+    const card = document.querySelector(`.quick-info .quick-info-card:nth-child(${index + 1})`);
+    if (!card || card.querySelector('.quick-info-media')) return;
+    const media = document.createElement('div');
+    media.className = 'quick-info-media';
+    media.dataset.rotatingMedia = `quick-info:${key}`;
+    media.setAttribute('role', 'img');
+    media.setAttribute('aria-label', `${key === 'worship' ? 'Sunday worship' : key === 'location' ? 'Church location' : 'Call us'} image`);
+    card.prepend(media);
+  });
   const targets = [...document.querySelectorAll('[data-rotating-media]')];
   if (!targets.length) return;
   const types = [...new Set(targets.map((target) => target.dataset.rotatingMedia.split(':')[0]))];

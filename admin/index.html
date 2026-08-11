@@ -54,6 +54,7 @@
         <button type="button" role="tab" aria-selected="false" aria-controls="pastor-manager" id="pastor-tab" data-admin-tab="pastor">Pastor Photos</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="mission-manager" id="mission-tab" data-admin-tab="missions">Mission Photos</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="ministry-manager" id="ministry-tab" data-admin-tab="ministries">Ministry Photos</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="quick-info-manager" id="quick-info-tab" data-admin-tab="quick-info">Worship &amp; Contact</button>
       </div>
 
       <section class="admin-panel" id="gallery-manager" role="tabpanel" aria-labelledby="gallery-tab" data-admin-panel="gallery">
@@ -90,14 +91,24 @@
       </section>
 
       <section class="admin-panel admin-panel--collections" id="mission-manager" role="tabpanel" aria-labelledby="mission-tab" data-admin-panel="missions" hidden>
-        <div class="admin-workspace admin-workspace--wide"><div class="admin-workspace-heading"><div><p class="admin-eyebrow">MISSIONS PAGE</p><h2>Mission Photo Carousels</h2><p>Upload multiple photos for each mission area. Drag to reorder; the first photo appears first.</p></div></div><div class="admin-media-collections" data-collection-manager="missions"></div></div>
+        <aside class="admin-sidebar"><div class="admin-panel-heading"><div><p class="admin-eyebrow">MISSIONS PAGE</p><h2>Mission Areas</h2></div><span>3</span></div><div class="admin-album-list" data-collection-list="missions"></div></aside>
+        <div class="admin-workspace"><div class="admin-workspace-heading"><div><p class="admin-eyebrow">SELECTED MISSION</p><h2 data-collection-title="missions">Local Mission</h2><p data-collection-summary="missions">Manage the rotating photos for this mission card.</p></div><label class="admin-upload is-disabled"><input type="file" accept="image/jpeg,image/png,image/webp" multiple data-selected-collection-upload="missions" disabled><span>Add Photos</span></label></div><div class="admin-photo-grid" data-selected-collection-grid="missions"></div></div>
       </section>
 
       <section class="admin-panel admin-panel--collections" id="ministry-manager" role="tabpanel" aria-labelledby="ministry-tab" data-admin-panel="ministries" hidden>
-        <div class="admin-workspace admin-workspace--wide"><div class="admin-workspace-heading"><div><p class="admin-eyebrow">MINISTRIES PAGE</p><h2>Ministry Photo Carousels</h2><p>Upload multiple photos for each ministry. The same moving gallery is used on its card and detail window.</p></div></div><div class="admin-media-collections" data-collection-manager="ministries"></div></div>
+        <aside class="admin-sidebar"><div class="admin-panel-heading"><div><p class="admin-eyebrow">MINISTRIES PAGE</p><h2>Ministries</h2></div><span>4</span></div><div class="admin-album-list" data-collection-list="ministries"></div></aside>
+        <div class="admin-workspace"><div class="admin-workspace-heading"><div><p class="admin-eyebrow">SELECTED MINISTRY</p><h2 data-collection-title="ministries">Kids Ministry</h2><p data-collection-summary="ministries">Manage the rotating photos for this ministry card and detail window.</p></div><label class="admin-upload is-disabled"><input type="file" accept="image/jpeg,image/png,image/webp" multiple data-selected-collection-upload="ministries" disabled><span>Add Photos</span></label></div><div class="admin-photo-grid" data-selected-collection-grid="ministries"></div></div>
+      </section>
+
+      <section class="admin-panel admin-panel--collections" id="quick-info-manager" role="tabpanel" aria-labelledby="quick-info-tab" data-admin-panel="quick-info" hidden>
+        <aside class="admin-sidebar"><div class="admin-panel-heading"><div><p class="admin-eyebrow">HOMEPAGE CARDS</p><h2>Worship &amp; Contact</h2></div><span>3</span></div><div class="admin-album-list" data-quick-info-list></div></aside>
+        <div class="admin-workspace"><div class="admin-workspace-heading"><div><p class="admin-eyebrow">SELECTED CARD</p><h2 data-quick-info-title>Sunday Worship</h2><p data-quick-info-summary>Manage the rotating photos shown on this homepage card.</p></div><label class="admin-upload is-disabled"><input type="file" accept="image/jpeg,image/png,image/webp" multiple data-quick-info-upload disabled><span>Add Photos</span></label></div><div class="admin-photo-grid" data-quick-info-grid></div></div>
       </section>
 
     </main>
+    <dialog class="admin-confirm-dialog" data-confirm-dialog aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message">
+      <div class="admin-confirm-card"><div class="admin-confirm-icon" aria-hidden="true">!</div><p class="admin-eyebrow">CONFIRM DELETION</p><h2 id="confirm-dialog-title" data-confirm-title>Delete this item?</h2><p id="confirm-dialog-message" data-confirm-message>This action cannot be undone.</p><div class="admin-confirm-actions"><button type="button" data-confirm-cancel>Cancel</button><button class="admin-confirm-delete" type="button" data-confirm-delete>Delete</button></div></div>
+    </dialog>
     <dialog class="admin-event-dialog" data-event-publish-dialog aria-labelledby="event-publish-title">
       <form class="admin-event-form" data-event-publish-form>
         <div class="admin-event-dialog-heading"><div><p class="admin-eyebrow">NEW UPCOMING EVENT</p><h2 id="event-publish-title">Add poster details</h2><p data-event-file-name></p></div><button type="button" data-event-publish-close aria-label="Cancel event upload">×</button></div>
@@ -112,6 +123,6 @@
       </form>
     </dialog>
     <template id="admin-photo-template"><article class="admin-photo"><div class="admin-photo-preview"><img alt="" /><span class="admin-cover-badge">Cover</span></div><div class="admin-photo-info"><strong></strong><small></small></div><div class="admin-photo-actions"><button type="button" data-action="cover">Make cover</button><button type="button" data-action="up" aria-label="Move earlier">↑</button><button type="button" data-action="down" aria-label="Move later">↓</button><button class="admin-danger" type="button" data-action="delete">Delete</button></div></article></template>
-    <script src="../js/admin.js?v=20260810-mission-ministry-media"></script>
+    <script src="../js/admin.js?v=20260810-confirm-deletions"></script>
   </body>
 </html>
