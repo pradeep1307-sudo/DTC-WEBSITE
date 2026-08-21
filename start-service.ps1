@@ -48,22 +48,20 @@ try {
 
       if ($requestPath -eq 'api/upcoming-events') {
         $upcomingFolder = Join-Path $root 'assets/upcoming'
+        $eventsFile = Join-Path $upcomingFolder 'events.json'
         $upcomingManifest = Join-Path $upcomingFolder 'manifest.json'
-        if (Test-Path -LiteralPath $upcomingManifest -PathType Leaf) {
-          $bytes = [IO.File]::ReadAllBytes($upcomingManifest)
-          $header = "HTTP/1.1 200 OK`r`nContent-Type: application/json; charset=utf-8`r`nContent-Length: $($bytes.Length)`r`nCache-Control: no-cache`r`nConnection: close`r`n`r`n"
-          $headerBytes = [Text.Encoding]::ASCII.GetBytes($header)
-          $stream.Write($headerBytes, 0, $headerBytes.Length)
-          $stream.Write($bytes, 0, $bytes.Length)
-          continue
-        }
-        $slides = if (Test-Path -LiteralPath $upcomingFolder -PathType Container) {
+        $eventsJson = if (Test-Path -LiteralPath $eventsFile -PathType Leaf) { [IO.File]::ReadAllText($eventsFile, [Text.Encoding]::UTF8) } else { '[]' }
+        $postersJson = if (Test-Path -LiteralPath $upcomingManifest -PathType Leaf) {
+          [IO.File]::ReadAllText($upcomingManifest, [Text.Encoding]::UTF8)
+        } elseif (Test-Path -LiteralPath $upcomingFolder -PathType Container) {
+          $slides = @(
           Get-ChildItem -LiteralPath $upcomingFolder -File | Where-Object { $_.Extension -match '^\.(png|jpe?g|webp)$' } | Sort-Object Name | ForEach-Object { "assets/upcoming/$([Uri]::EscapeDataString($_.Name))" }
-        } else { @() }
-        $slideItems = @($slides | ForEach-Object { '"' + ($_ -replace '\\', '\\\\' -replace '"', '\\"') + '"' })
-        $slidesJson = '[' + [string]::Join(',', $slideItems) + ']'
-        $bytes = [Text.Encoding]::UTF8.GetBytes($slidesJson)
-        $header = "HTTP/1.1 200 OK`r`nContent-Type: application/json; charset=utf-8`r`nContent-Length: $($bytes.Length)`r`nConnection: close`r`n`r`n"
+          )
+          ConvertTo-Json -InputObject @($slides) -Compress
+        } else { '[]' }
+        $payload = '{"events":' + $eventsJson + ',"posters":' + $postersJson + '}'
+        $bytes = [Text.Encoding]::UTF8.GetBytes($payload)
+        $header = "HTTP/1.1 200 OK`r`nContent-Type: application/json; charset=utf-8`r`nContent-Length: $($bytes.Length)`r`nCache-Control: no-store, no-cache, must-revalidate, max-age=0`r`nConnection: close`r`n`r`n"
         $headerBytes = [Text.Encoding]::ASCII.GetBytes($header)
         $stream.Write($headerBytes, 0, $headerBytes.Length)
         $stream.Write($bytes, 0, $bytes.Length)
@@ -106,35 +104,26 @@ try {
         try {
           $streamsUrl = 'https://www.youtube.com/@TamilChurchDenver/streams'
           $youtubeHeaders = @{
-            'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36'
+            'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0.0.0 Safari/537.36'
             'Accept-Language' = 'en-US,en;q=0.9'
+            'Accept' = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
           }
           $pageContent = (Invoke-WebRequest -Uri $streamsUrl -UseBasicParsing -Headers $youtubeHeaders -TimeoutSec 30).Content
-          $lockupPositions = @([regex]::Matches($pageContent, '"lockupViewModel":') | ForEach-Object { $_.Index })
-          $cutoff = [DateTime]::UtcNow.AddDays(-60).Date
-          $parsedVideos = @()
-          for ($index = 0; $index -lt $lockupPositions.Count; $index += 1) {
-            $start = $lockupPositions[$index]
-            $end = if ($index + 1 -lt $lockupPositions.Count) { $lockupPositions[$index + 1] } else { [Math]::Min($pageContent.Length, $start + 30000) }
-            $lockup = $pageContent.Substring($start, $end - $start)
-            $idMatch = [regex]::Match($lockup, '"contentId":"([a-zA-Z0-9_-]{11})"')
-            if (-not $idMatch.Success) { continue }
-            $title = @([regex]::Matches($lockup, '"content":"([^"\\]*(?:\\.[^"\\]*)*)"') | ForEach-Object { $_.Groups[1].Value }) |
-              Where-Object { $_ -match '(?i)Sunday Service' } | Select-Object -First 1
-            if ([string]::IsNullOrWhiteSpace($title)) { continue }
-            $dateMatch = [regex]::Match($title, '(?i)(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(\d{1,2})\s+(\d{4})')
-            if (-not $dateMatch.Success) { continue }
-            $published = [DateTime]::Parse($dateMatch.Value, [Globalization.CultureInfo]::InvariantCulture)
-            if ($published.Date -lt $cutoff) { continue }
-            $parsedVideos += [pscustomobject]@{ Id = $idMatch.Groups[1].Value; Title = $title; Published = $published }
+          $seenVideoIds = New-Object 'System.Collections.Generic.HashSet[string]'
+          $videos = @()
+          $blocks = $pageContent -split '"lockupViewModel":'
+          foreach ($block in ($blocks | Select-Object -Skip 1)) {
+            $idMatch = [regex]::Match($block, '"contentId":"([a-zA-Z0-9_-]{11})"')
+            if (-not $idMatch.Success -or -not $seenVideoIds.Add($idMatch.Groups[1].Value)) { continue }
+            $titleMatch = [regex]::Match($block.Substring(0, [Math]::Min($block.Length, 40000)), '"content":"([^"\\]*(?:\\.[^"\\]*)*)"')
+            $title = if ($titleMatch.Success) { ConvertFrom-Json ('"' + $titleMatch.Groups[1].Value + '"') } else { $null }
+            if ([string]::IsNullOrWhiteSpace($title)) { $title = if (-not $videos.Count) { 'Latest Live Service' } else { 'Previous Live Service' } }
+            $videoId = $idMatch.Groups[1].Value
+            $videos += [pscustomobject]@{ id = $videoId; title = $title; published = ''; url = "https://www.youtube.com/watch?v=$videoId"; thumbnail = "https://i.ytimg.com/vi/$videoId/hqdefault.jpg" }
+            if ($videos.Count -eq 9) { break }
           }
-          $videoItems = @($parsedVideos | Sort-Object Published -Descending | Group-Object Id | ForEach-Object {
-            $video = $_.Group[0]
-            $escapedTitle = $video.Title.Replace('\', '\\').Replace('"', '\"').Replace("`r", '\r').Replace("`n", '\n').Replace("`t", '\t')
-            '{"id":"' + $video.Id + '","title":"' + $escapedTitle + '","published":"' + $video.Published.ToString('o') + '","url":"https://www.youtube.com/watch?v=' + $video.Id + '","thumbnail":"https://i.ytimg.com/vi/' + $video.Id + '/hqdefault.jpg"}'
-          })
-          if (-not $videoItems.Count) { throw 'No Sunday services were found on the Streams page.' }
-          $json = '[' + [string]::Join(',', $videoItems) + ']'
+          if (-not $videos.Count) { throw 'No videos were found on the YouTube Live tab.' }
+          $json = ConvertTo-Json -InputObject @($videos) -Compress
           $bytes = [Text.Encoding]::UTF8.GetBytes($json)
           $header = "HTTP/1.1 200 OK`r`nContent-Type: application/json; charset=utf-8`r`nContent-Length: $($bytes.Length)`r`nCache-Control: no-cache`r`nConnection: close`r`n`r`n"
         }
@@ -157,7 +146,7 @@ try {
         $bytes = [IO.File]::ReadAllBytes($candidate)
         $extension = [IO.Path]::GetExtension($candidate).ToLowerInvariant()
         $contentType = if ($mimeTypes.ContainsKey($extension)) { $mimeTypes[$extension] } else { 'application/octet-stream' }
-        $cacheHeader = if ($requestPath.EndsWith('.html') -or $requestPath -in @('admin/index.html', 'admin/admin.css', 'js/admin.js', 'js/script.js', 'js/events.js', 'styles.css', 'design-system.css', 'assets/upcoming/events.json', 'assets/upcoming/manifest.json', 'assets/backgrounds/manifest.json', 'assets/pastor/manifest.json')) {
+        $cacheHeader = if ($requestPath.EndsWith('.html') -or $requestPath -in @('admin/index.html', 'admin/admin.css', 'js/admin.js', 'js/script.js', 'js/events.js', 'styles.css', 'design-system.css', 'app-theme.css', 'assets/upcoming/events.json', 'assets/upcoming/manifest.json', 'assets/backgrounds/manifest.json', 'assets/pastor/manifest.json')) {
           "Cache-Control: no-store, no-cache, must-revalidate, max-age=0`r`nPragma: no-cache`r`nExpires: 0`r`n"
         } else { '' }
         $header = "HTTP/1.1 200 OK`r`nContent-Type: $contentType`r`nContent-Length: $($bytes.Length)`r`n${cacheHeader}Connection: close`r`n`r`n"

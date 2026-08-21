@@ -1,13 +1,13 @@
 :root {
-  --bg: #eef6ff;
+  --bg: #f3f3f3;
   --surface: #ffffff;
-  --surface-soft: #f8fbff;
-  --text: #0f172a;
-  --muted: #475569;
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
-  --accent: #7c3aed;
-  --border: #dbe7f0;
+  --surface-soft: #f4f4f4;
+  --text: #292929;
+  --muted: #595959;
+  --primary: #cf1034;
+  --primary-dark: #a80d2b;
+  --accent: #cf1034;
+  --border: #d4d4d4;
 }
 * {
   box-sizing: border-box;
@@ -15,9 +15,9 @@
   padding: 0;
 }
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Lato', Helvetica, Arial, sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at top, rgba(59, 130, 246, 0.14), rgba(255, 255, 255, 0.8)), var(--bg);
+  background: radial-gradient(circle at top, rgba(207, 16, 52, 0.07), rgba(255, 255, 255, 0.82)), var(--bg);
   line-height: 1.75;
   font-size: 16px;
   opacity: 0;

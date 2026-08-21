@@ -129,20 +129,20 @@
   },
   {
     "id": "teen-adult-service",
-    "title": "Teen and Adult Sunday Service",
+    "title": "Teen and Young Adult English Service",
     "dateLabel": "Third Sunday of every month at 4:30 PM Mountain Time",
     "time": "4:30 PM",
     "recurrence": "third-sunday",
     "calendarOnly": true,
     "location": "9052 W Ken Caryl Ave, Littleton, CO 80128",
     "image": "assets/images/ministry-youth.jpg",
-    "summary": "A third-Sunday service bringing teens and adults together for worship, God’s Word, prayer, and fellowship.",
+    "summary": "A third-Sunday English service for teens and young adults with worship, God’s Word, prayer, and fellowship.",
     "details": [
       "Held on the third Sunday of each month",
       "Service begins at 4:30 PM",
       "Worship and Scripture teaching",
       "Prayer and fellowship",
-      "Teens and adults are welcome"
+      "Teens and young adults are welcome"
     ]
   },
   {
@@ -164,14 +164,15 @@
   {
     "id": "womens-bible-study",
     "title": "Women’s Bible Study",
-    "dateLabel": "First and third Thursday of every month · Online via Zoom",
+    "dateLabel": "Alternate Thursdays at 6:00 PM · Online via Zoom",
+    "time": "6:00 PM",
     "recurrence": "first-third-thursday",
     "calendarOnly": true,
     "location": "Online via Zoom",
     "image": "assets/images/ministry-women.jpg",
     "summary": "Women gather online to study God’s Word, pray together, and encourage one another in faith.",
     "details": [
-      "Held on the first and third Thursday of each month",
+      "Held on the first and third Thursday of each month at 6:00 PM",
       "Join online through Zoom",
       "Bible study and discussion",
       "Prayer and encouragement",
@@ -198,11 +199,12 @@
   },
   {
     "id": "gods-promise-service",
-    "title": "God’s Promise Service",
-    "dateLabel": "First day of every month at 6:00 AM",
+    "title": "God’s Promise Word Service",
+    "dateLabel": "First day of every month at 6:00 AM · Online via Zoom",
     "time": "6:00 AM",
     "recurrence": "first-of-month",
     "calendarOnly": true,
+    "location": "Online via Zoom",
     "image": "assets/images/church-sanctuary-hero.jpg",
     "summary": "Begin each month in God’s presence with early-morning worship, Scripture, and prayer.",
     "details": [
@@ -210,7 +212,7 @@
       "Service begins at 6:00 AM",
       "Worship and Scripture",
       "Prayer for the new month",
-      "Contact the church to confirm the meeting location"
+      "Join online through Zoom"
     ]
   },
   {

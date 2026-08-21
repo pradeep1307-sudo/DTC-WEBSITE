@@ -249,12 +249,9 @@ const addUpcomingEventCarousel = async () => {
       const eventData = await eventResponse.json();
       const publishedPosters = await posterResponse.json();
       const normalizePath = (path = '') => decodeURIComponent(path).replace(/\\/g, '/').toLowerCase();
-      const activeImages = new Set();
-      const now = new Date();
-      const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-      (Array.isArray(eventData) ? eventData : []).forEach((event) => {
-        if (!event.calendarOnly && event.image && (event.recurrence || (event.date && event.date >= todayKey))) activeImages.add(normalizePath(event.image));
-      });
+      const activeImages = new Set((Array.isArray(eventData) ? eventData : [])
+        .filter((event) => !event.calendarOnly && event.image)
+        .map((event) => normalizePath(event.image)));
       slides = (Array.isArray(publishedPosters) ? publishedPosters : []).filter((image) => activeImages.has(normalizePath(image)));
     }
   } catch (error) { /* Use the stable Sunday-service poster below. */ }
@@ -723,6 +720,7 @@ const initPreviousServices = async () => {
   right.addEventListener('click', () => move(1));
   track.addEventListener('scroll', updateArrows, { passive: true });
   window.addEventListener('resize', updateArrows);
+  const escapeText = (value) => String(value || '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 
   try {
     const response = await fetch('/api/youtube-videos', { cache: 'no-store' });
@@ -735,20 +733,23 @@ const initPreviousServices = async () => {
       liveFrame.src = `https://www.youtube.com/embed/${latest.id}`;
       liveFrame.title = latest.title;
     }
+    const heading = document.querySelector('#live-watch-title [data-lang="en"], #live-watch-title');
+    if (heading) heading.textContent = latest.title;
     const previousVideos = videos.slice(1, 9);
+    if (!previousVideos.length) throw new Error('No previous videos');
     const formatter = new Intl.DateTimeFormat(document.documentElement.lang === 'ta' ? 'ta-IN' : 'en-US', {
       month: 'short', day: 'numeric', year: 'numeric'
     });
     track.innerHTML = previousVideos.map((video) => `
       <article class="previous-service-card">
-        <a href="${video.url}" target="_blank" rel="noopener noreferrer">
+        <a href="${escapeText(video.url)}" target="_blank" rel="noopener noreferrer">
           <span class="previous-service-image">
-            <img src="${video.thumbnail}" alt="" width="480" height="360" loading="lazy" />
+            <img src="${escapeText(video.thumbnail)}" alt="${escapeText(video.title)}" width="480" height="360" loading="lazy" />
             <span class="previous-service-play" aria-hidden="true">▶</span>
           </span>
           <span class="previous-service-content">
-            <time datetime="${video.published}">${formatter.format(new Date(video.published))}</time>
-            <strong>${video.title}</strong>
+            <time datetime="${escapeText(video.published)}">${video.published ? formatter.format(new Date(video.published)) : 'Previous service'}</time>
+            <strong>${escapeText(video.title)}</strong>
           </span>
         </a>
       </article>`).join('');

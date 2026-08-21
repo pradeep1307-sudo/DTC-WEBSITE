@@ -1,24 +1,41 @@
-const eventsDataUrl = 'assets/upcoming/events.json';
+let publishedEventsRequest;
+const normalizeEventPath = (path = '') => decodeURIComponent(path).replace(/\\/g, '/').toLowerCase();
+const publishedOnly = (events, posters) => {
+  const publishedImages = new Set((Array.isArray(posters) ? posters : []).map(normalizeEventPath));
+  return (Array.isArray(events) ? events : []).filter((event) => !event.calendarOnly && event.image && publishedImages.has(normalizeEventPath(event.image)));
+};
+const loadPublishedEvents = () => {
+  if (publishedEventsRequest) return publishedEventsRequest;
+  publishedEventsRequest = (async () => {
+    try {
+      const response = await fetch('/api/upcoming-events', { cache: 'no-store' });
+      if (!response.ok) throw new Error('Published event API unavailable');
+      const payload = await response.json();
+      if (payload && Array.isArray(payload.events) && Array.isArray(payload.posters)) return payload;
+    } catch (_) {}
+    const [eventsResponse, postersResponse] = await Promise.all([
+      fetch('assets/upcoming/events.json', { cache: 'no-store' }),
+      fetch(`assets/upcoming/manifest.json?v=${Date.now()}`, { cache: 'no-store' })
+    ]);
+    if (!eventsResponse.ok || !postersResponse.ok) throw new Error('Published events unavailable');
+    const events = await eventsResponse.json();
+    const posters = await postersResponse.json();
+    return { events, posters };
+  })();
+  return publishedEventsRequest;
+};
 
 const loadEvents = async () => {
-  const response = await fetch(eventsDataUrl, { cache: 'no-store' });
-  if (!response.ok) throw new Error('Unable to load events');
-  const events = await response.json();
-  const now = new Date();
-  const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  return (Array.isArray(events) ? events : []).filter((event) => event.calendarOnly || event.recurrence || !event.date || event.date >= todayKey);
+  const events = (await loadPublishedEvents()).events;
+  return Array.isArray(events) ? events : [];
 };
 const loadEventPosters = async () => {
-  const response = await fetch(`assets/upcoming/manifest.json?v=${Date.now()}`, { cache: 'no-store' });
-  if (!response.ok) throw new Error('Unable to load event posters');
-  const posters = await response.json();
+  const posters = (await loadPublishedEvents()).posters;
   return Array.isArray(posters) ? posters : [];
 };
 
 const eventUrl = (event) => `event-details.html?id=${encodeURIComponent(event.id)}`;
 const escapeText = (value = '') => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
-const localDateKey = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-const isUpcomingEvent = (event, todayKey = localDateKey()) => Boolean(event.recurrence || (event.date && event.date >= todayKey));
 const christianObservanceIds = new Set(['palm-sunday-2026', 'maundy-thursday-2026', 'good-friday-2026', 'holy-saturday-2026', 'easter-sunday-2026', 'ascension-day-2026', 'pentecost-sunday-2026', 'advent-sunday-2026', 'christmas-eve-2026', 'christmas-day-2026']);
 const usHolidayIds = new Set(['new-years-day-2026', 'mlk-day-2026', 'presidents-day-2026', 'memorial-day-2026', 'juneteenth-2026', 'independence-day-2026', 'labor-day-2026', 'columbus-day-2026', 'veterans-day-2026', 'thanksgiving-day-2026']);
 const eventCategory = (event) => christianObservanceIds.has(event.id) ? 'christian' : usHolidayIds.has(event.id) ? 'holiday' : 'church';
@@ -98,13 +115,13 @@ const renderEventCards = (events, posters) => {
   const list = document.querySelector('[data-event-list]');
   if (!list) return;
   const visibleEvents = events
-    .filter((event) => !event.calendarOnly && event.image && isUpcomingEvent(event))
+    .filter((event) => !event.calendarOnly && event.image)
     .sort((first, second) => (first.date || '9999-12-31').localeCompare(second.date || '9999-12-31'));
-  const normalizePath = (path = '') => decodeURIComponent(path).replace(/\\/g, '/').toLowerCase();
-  const eventByImage = new Map(visibleEvents.map((event) => [normalizePath(event.image), event]));
-  const posterCards = posters
-    .map((image) => eventByImage.get(normalizePath(image)))
-    .filter(Boolean)
+  const eventByImage = new Map(visibleEvents.map((event) => [normalizeEventPath(event.image), event]));
+  const orderedCards = posters
+    .map((image) => eventByImage.get(normalizeEventPath(image)))
+    .filter(Boolean);
+  const posterCards = orderedCards
     .map((event) => ({ ...event, href: eventUrl(event), external: false }));
   if (!posterCards.length) {
     list.innerHTML = '<p class="event-loading">No special events are currently scheduled. Please check the church calendar below for recurring services.</p>';
@@ -222,6 +239,6 @@ const renderEventDetail = (events) => {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-  try { const [events, posters] = await Promise.all([loadEvents(), loadEventPosters()]); renderEventCards(events, posters); renderEventAgenda(events); renderCalendar(events); renderEventDetail(events); }
+  try { const [events, posters] = await Promise.all([loadEvents(), loadEventPosters()]); const published = publishedOnly(events, posters); const calendarEvents = [...published, ...events.filter((event) => event.calendarOnly)]; renderEventCards(published, posters); renderEventAgenda(calendarEvents); renderCalendar(calendarEvents); renderEventDetail(calendarEvents); }
   catch (error) { document.querySelectorAll('[data-event-list], [data-event-detail]').forEach((node) => { node.innerHTML = '<p>Event information is temporarily unavailable. Please contact the church for assistance.</p>'; }); }
 });
