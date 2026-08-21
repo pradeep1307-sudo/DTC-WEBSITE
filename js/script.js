@@ -216,7 +216,7 @@ const addUpcomingEventSlide = () => {
   const eventGrid = events?.querySelector('.event-grid');
   if (!events || !eventGrid || events.querySelector('.event-poster')) return;
 
-  const slideSource = 'assets/ChatGPT%20Image%20Aug%202%2C%202026%2C%2009_30_53%20AM.png';
+  const slideSource = 'assets/upcoming/ChatGPT%20Image%20Aug%202%2C%202026%2C%2009_30_53%20AM.png';
   eventGrid.remove();
   const poster = document.createElement('button');
   poster.type = 'button';
@@ -239,19 +239,26 @@ const addUpcomingEventCarousel = async () => {
   const eventGrid = events?.querySelector('.event-grid');
   if (!events || !eventGrid || events.querySelector('.event-carousel')) return;
 
-  const fallbackSlide = 'assets/ChatGPT%20Image%20Aug%202%2C%202026%2C%2009_30_53%20AM.png';
   let slides = [];
   try {
-    const response = await fetch('/api/upcoming-events', { cache: 'no-store' });
-    if (response.ok) slides = await response.json();
-  } catch (error) { /* Static hosts use the manifest fallback below. */ }
-  if (!Array.isArray(slides) || !slides.length) {
-    try {
-      const response = await fetch('assets/upcoming/manifest.json', { cache: 'no-store' });
-      if (response.ok) slides = await response.json();
-    } catch (error) { /* Use the existing poster until new slides are supplied. */ }
-  }
-  if (!Array.isArray(slides) || !slides.length) slides = [fallbackSlide];
+    const [eventResponse, posterResponse] = await Promise.all([
+      fetch('assets/upcoming/events.json', { cache: 'no-store' }),
+      fetch('assets/upcoming/manifest.json', { cache: 'no-store' })
+    ]);
+    if (eventResponse.ok && posterResponse.ok) {
+      const eventData = await eventResponse.json();
+      const publishedPosters = await posterResponse.json();
+      const normalizePath = (path = '') => decodeURIComponent(path).replace(/\\/g, '/').toLowerCase();
+      const activeImages = new Set();
+      const now = new Date();
+      const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      (Array.isArray(eventData) ? eventData : []).forEach((event) => {
+        if (!event.calendarOnly && event.image && (event.recurrence || (event.date && event.date >= todayKey))) activeImages.add(normalizePath(event.image));
+      });
+      slides = (Array.isArray(publishedPosters) ? publishedPosters : []).filter((image) => activeImages.has(normalizePath(image)));
+    }
+  } catch (error) { /* Use the stable Sunday-service poster below. */ }
+  if (!Array.isArray(slides) || !slides.length) slides = ['assets/upcoming/ChatGPT%20Image%20Aug%202%2C%202026%2C%2008_22_15%20PM.png'];
 
   // One-line summaries transcribed from each event poster.
   const eventSummaries = [
@@ -746,10 +753,23 @@ const initPreviousServices = async () => {
         </a>
       </article>`).join('');
   } catch (error) {
-    track.innerHTML = `<article class="previous-service-card previous-service-card--fallback">
+    const uploadsPlaylist = 'UUNPyD_nYVLhC5-47771aGdw';
+    const liveFrame = document.querySelector('.live-embed iframe');
+    if (liveFrame) {
+      liveFrame.src = `https://www.youtube.com/embed/videoseries?list=${uploadsPlaylist}&index=0`;
+      liveFrame.title = 'Latest Denver Tamil Church service';
+    }
+    track.innerHTML = Array.from({ length: 8 }, (_, index) => `
+      <article class="previous-service-card previous-service-card--fallback">
+        <iframe src="https://www.youtube.com/embed/videoseries?list=${uploadsPlaylist}&index=${index + 1}" title="Denver Tamil Church previous service ${index + 1}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        <div class="previous-service-fallback-content"><strong>Previous Service ${index + 1}</strong><a href="https://www.youtube.com/@TamilChurchDenver/streams" target="_blank" rel="noopener noreferrer">Open on YouTube</a></div>
+      </article>`).join('');
+    if (false) {
+      track.innerHTML = `<article class="previous-service-card previous-service-card--fallback">
       <iframe src="https://www.youtube.com/embed/videoseries?list=UUNPyD_nYVLhC5-47771aGdw" title="Recent Denver Tamil Church services" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       <div class="previous-service-fallback-content"><strong>Recent Services</strong><span>The live YouTube playlist is shown while the local two-month feed reconnects.</span><a href="https://www.youtube.com/@TamilChurchDenver/streams" target="_blank" rel="noopener noreferrer">View all streams →</a></div>
     </article>`;
+    }
     setLanguage(localStorage.getItem('siteLanguage') || 'en');
   }
   updateArrows();
@@ -769,11 +789,11 @@ const initGallery = async () => {
 
   const albumCovers = {
     'sunday-services': 'assets/images/church-sanctuary-hero.jpg',
-    'vbs': 'assets/upcoming/ChatGPT%20Image%20Jul%2011%2C%202026%2C%2010_38_46%20PM.png',
+    'vbs': 'assets/images/ministry-kids.jpg',
     'prayer-night': 'assets/images/church-sanctuary-hero.jpg',
-    'christmas': 'assets/upcoming/ChatGPT%20Image%20Aug%202%2C%202026%2C%2009_16_32%20AM.png',
-    'easter': 'assets/upcoming/ChatGPT%20Image%20Jul%2012%2C%202026%2C%2005_28_37%20PM%20%282%29.png',
-    'youth': 'assets/upcoming/ChatGPT%20Image%20Aug%202%2C%202026%2C%2001_32_27%20PM.png',
+    'christmas': 'assets/images/church-sanctuary-hero.jpg',
+    'easter': 'assets/images/church-sanctuary-hero.jpg',
+    'youth': 'assets/images/ministry-youth.jpg',
     'womens-ministry': 'assets/upcoming/ChatGPT%20Image%20Aug%202%2C%202026%2C%2008_22_15%20PM.png',
     'community-outreach': 'assets/images/church-missions-hero.jpg'
   };

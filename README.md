@@ -3,7 +3,7 @@ Denver Tamil Church App
 
 ## Local media administration
 
-1. Start the local website with `start-service.ps1`.
+1. Start the local website with `start-service.cmd`. It safely launches the PowerShell server even when local script execution is disabled.
 2. Open `http://localhost:8000/admin/` in Microsoft Edge or Google Chrome. The former `/admin.html` address redirects here automatically.
 3. Select the local `DTC App` project folder when prompted.
 4. Create Gallery albums, add photos, choose covers, or manage Upcoming Event posters.

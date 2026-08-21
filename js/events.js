@@ -3,7 +3,10 @@ const eventsDataUrl = 'assets/upcoming/events.json';
 const loadEvents = async () => {
   const response = await fetch(eventsDataUrl, { cache: 'no-store' });
   if (!response.ok) throw new Error('Unable to load events');
-  return response.json();
+  const events = await response.json();
+  const now = new Date();
+  const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  return (Array.isArray(events) ? events : []).filter((event) => event.calendarOnly || event.recurrence || !event.date || event.date >= todayKey);
 };
 const loadEventPosters = async () => {
   const response = await fetch(`assets/upcoming/manifest.json?v=${Date.now()}`, { cache: 'no-store' });
@@ -14,6 +17,8 @@ const loadEventPosters = async () => {
 
 const eventUrl = (event) => `event-details.html?id=${encodeURIComponent(event.id)}`;
 const escapeText = (value = '') => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+const localDateKey = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+const isUpcomingEvent = (event, todayKey = localDateKey()) => Boolean(event.recurrence || (event.date && event.date >= todayKey));
 const christianObservanceIds = new Set(['palm-sunday-2026', 'maundy-thursday-2026', 'good-friday-2026', 'holy-saturday-2026', 'easter-sunday-2026', 'ascension-day-2026', 'pentecost-sunday-2026', 'advent-sunday-2026', 'christmas-eve-2026', 'christmas-day-2026']);
 const usHolidayIds = new Set(['new-years-day-2026', 'mlk-day-2026', 'presidents-day-2026', 'memorial-day-2026', 'juneteenth-2026', 'independence-day-2026', 'labor-day-2026', 'columbus-day-2026', 'veterans-day-2026', 'thanksgiving-day-2026']);
 const eventCategory = (event) => christianObservanceIds.has(event.id) ? 'christian' : usHolidayIds.has(event.id) ? 'holiday' : 'church';
@@ -92,21 +97,19 @@ const renderEventAgenda = (events) => {
 const renderEventCards = (events, posters) => {
   const list = document.querySelector('[data-event-list]');
   if (!list) return;
-  const visibleEvents = events.filter((event) => !event.calendarOnly);
+  const visibleEvents = events
+    .filter((event) => !event.calendarOnly && event.image && isUpcomingEvent(event))
+    .sort((first, second) => (first.date || '9999-12-31').localeCompare(second.date || '9999-12-31'));
   const normalizePath = (path = '') => decodeURIComponent(path).replace(/\\/g, '/').toLowerCase();
   const eventByImage = new Map(visibleEvents.map((event) => [normalizePath(event.image), event]));
-  const posterCards = posters.map((image) => {
-    const event = eventByImage.get(normalizePath(image));
-    if (event) return { ...event, href: eventUrl(event), external: false };
-    return {
-      title: 'Church Announcement',
-      dateLabel: 'View the poster for complete details',
-      image,
-      summary: 'A newly published update from Denver Tamil Church.',
-      href: image,
-      external: true
-    };
-  });
+  const posterCards = posters
+    .map((image) => eventByImage.get(normalizePath(image)))
+    .filter(Boolean)
+    .map((event) => ({ ...event, href: eventUrl(event), external: false }));
+  if (!posterCards.length) {
+    list.innerHTML = '<p class="event-loading">No special events are currently scheduled. Please check the church calendar below for recurring services.</p>';
+    return;
+  }
   list.innerHTML = posterCards.map((event, index) => `<article class="event-poster-card" data-event-slide="${index}"><a href="${escapeText(event.href)}"${event.external ? ' target="_blank" rel="noopener noreferrer"' : ''}><figure><img src="${escapeText(event.image)}" alt="${escapeText(event.title)} poster" width="1672" height="941" loading="lazy" /><span class="event-poster-image-label">${event.external ? 'New update' : 'Featured event'}</span></figure><div class="event-poster-content"><span class="event-poster-kicker">Upcoming event</span><h3>${escapeText(event.title)}</h3><dl class="event-poster-meta"><div><dt>Details</dt><dd>${escapeText(event.dateLabel)}</dd></div>${event.location ? `<div><dt>Location</dt><dd>${escapeText(event.location)}</dd></div>` : ''}</dl><p>${escapeText(event.summary)}</p><strong>${event.external ? 'View full poster' : 'Explore event'} <span aria-hidden="true">→</span></strong></div></a></article>`).join('');
   list.tabIndex = 0;
   list.setAttribute('role', 'region');

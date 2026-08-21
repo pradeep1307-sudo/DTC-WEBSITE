@@ -6,7 +6,7 @@
     "dateLabel": "Sunday, August 9, 2026 · 7:05 AM",
     "time": "7:05 AM",
     "location": "Denver Tamil Church, 9052 W Ken Caryl Ave, Littleton, CO 80128",
-    "image": "assets/upcoming/ChatGPT%20Image%20Aug%202-%202026-%2001_32_27%20PM.png",
+    "image": "assets/images/church-sanctuary-hero.jpg",
     "summary": "Toyhejt",
     "details": [
       "yohjry"
@@ -19,7 +19,7 @@
     "dateLabel": "Sunday, August 16, 2026 · 4:30 PM",
     "time": "4:30 PM",
     "location": "Denver Tamil Church, 9052 W Ken Caryl Ave, Littleton, CO 80128",
-    "image": "assets/upcoming/ChatGPT%20Image%20Aug%205-%202026-%2007_20_24%20PM-2.png",
+    "image": "assets/images/church-sanctuary-hero.jpg",
     "summary": "Teen and Young Adult English Service",
     "details": [
       "Teen and Young Adult English Service"
@@ -47,7 +47,7 @@
     "dateLabel": "Wednesday, August 5, 2026 · 6:41 PM",
     "time": "6:41 PM",
     "location": "Denver Tamil Church, 9052 W Ken Caryl Ave, Littleton, CO 80128",
-    "image": "assets/upcoming/ChatGPT%20Image%20Aug%202-%202026-%2001_26_36%20PM.png",
+    "image": "assets/images/church-sanctuary-hero.jpg",
     "summary": "dafafafsgf",
     "details": [
       "fsg"
@@ -60,7 +60,7 @@
     "dateLabel": "Wednesday, August 5, 2026 · 7:27 PM",
     "time": "7:27 PM",
     "location": "Denver Tamil Church, 9052 W Ken Caryl Ave, Littleton, CO 80128",
-    "image": "assets/upcoming/ChatGPT%20Image%20Aug%205-%202026-%2005_31_54%20PM.png",
+    "image": "assets/images/church-sanctuary-hero.jpg",
     "summary": "d",
     "details": [
       "s"
@@ -73,7 +73,7 @@
     "dateLabel": "Wednesday, August 5, 2026 · 7:12 PM",
     "time": "7:12 PM",
     "location": "The Lone Tree Hub",
-    "image": "assets/upcoming/ChatGPT%20Image%20Aug%205-%202026-%2005_31_54%20PM.png",
+    "image": "assets/images/church-sanctuary-hero.jpg",
     "summary": "ff",
     "details": [
       "fgg"
@@ -86,7 +86,7 @@
     "dateLabel": "Thursday, August 6, 2026 · 6:02 PM",
     "time": "6:02 PM",
     "location": "5388 CLVOERBROOK CIR",
-    "image": "assets/upcoming/ChatGPT%20Image%20Aug%205-%202026-%2005_31_54%20PM.png",
+    "image": "assets/images/church-sanctuary-hero.jpg",
     "summary": "THIS IS JUST A TEST",
     "details": [
       "THIS IS JUST A TEST"
@@ -214,21 +214,6 @@
     ]
   },
   {
-    "id": "homeless-outreach",
-    "title": "Homeless Outreach",
-    "date": "2026-08-08",
-    "dateLabel": "Saturday, August 8, 2026",
-    "location": "The Salvation Army Denver, 1901 29th St, Denver, CO 80216",
-    "image": "assets/upcoming/ChatGPT Image Aug 2, 2026, 09_16_32 AM.png",
-    "summary": "Our church will cook and serve a warm meal to neighbors experiencing homelessness.",
-    "details": [
-      "Cook with love",
-      "Serve with joy",
-      "Encourage with kindness",
-      "Pray with faith"
-    ]
-  },
-  {
     "id": "power-surge",
     "title": "Power Surge Summer 2026",
     "dateLabel": "June–August 2026",
@@ -240,23 +225,6 @@
       "Back to School Bash on August 16",
       "Church Picnic on August 22",
       "Sunday worship at 4:30 PM Mountain Time"
-    ]
-  },
-  {
-    "id": "back-to-school",
-    "title": "Back to School Bash",
-    "date": "2026-08-16",
-    "dateLabel": "August 16, 2026 at 4:30 PM",
-    "time": "4:30 PM",
-    "location": "9052 W Ken Caryl Ave, Littleton, CO 80128",
-    "image": "assets/upcoming/ChatGPT Image Jul 12, 2026, 05_28_37 PM (2).png",
-    "summary": "A church-family celebration and prayer for students, teachers, and families beginning a new school year.",
-    "details": [
-      "Prayer for our children",
-      "An encouraging message",
-      "Back-to-school blessing",
-      "Games and activities",
-      "Food and fellowship"
     ]
   },
   {

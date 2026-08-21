@@ -4,7 +4,8 @@ param(
 
 $root = $PSScriptRoot
 $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
-if ($pythonCommand) {
+$isWindowsAppAlias = $pythonCommand -and $pythonCommand.Source -match '(?i)[\\/]WindowsApps[\\/]python(?:3)?\.exe$'
+if ($pythonCommand -and -not $isWindowsAppAlias) {
   Push-Location $root
   try {
     & $pythonCommand.Source server.py
@@ -138,8 +139,11 @@ try {
           $header = "HTTP/1.1 200 OK`r`nContent-Type: application/json; charset=utf-8`r`nContent-Length: $($bytes.Length)`r`nCache-Control: no-cache`r`nConnection: close`r`n`r`n"
         }
         catch {
-          $bytes = [Text.Encoding]::UTF8.GetBytes('{"error":"Video feed unavailable"}')
-          $header = "HTTP/1.1 502 Bad Gateway`r`nContent-Type: application/json; charset=utf-8`r`nContent-Length: $($bytes.Length)`r`nConnection: close`r`n`r`n"
+          # The Live page uses its YouTube uploads-playlist fallback when no
+          # fresh API results are available. Keep that fallback reachable
+          # without turning a temporary upstream failure into a server error.
+          $bytes = [Text.Encoding]::UTF8.GetBytes('[]')
+          $header = "HTTP/1.1 200 OK`r`nContent-Type: application/json; charset=utf-8`r`nContent-Length: $($bytes.Length)`r`nCache-Control: no-cache`r`nConnection: close`r`n`r`n"
         }
         $headerBytes = [Text.Encoding]::ASCII.GetBytes($header)
         $stream.Write($headerBytes, 0, $headerBytes.Length)

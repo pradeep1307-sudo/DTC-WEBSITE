@@ -152,10 +152,13 @@ class Handler(SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps(videos, ensure_ascii=False).encode('utf-8'))
             except Exception as error:
-                self.send_response(502)
+                # The Live page falls back to the channel uploads playlist.
+                # Return an empty successful feed during temporary upstream
+                # failures so the rest of the local app remains healthy.
+                self.send_response(200)
                 self.send_header('Content-Type', 'application/json; charset=utf-8')
                 self.end_headers()
-                self.wfile.write(json.dumps({'error': str(error)}).encode('utf-8'))
+                self.wfile.write(b'[]')
             return
         if self.path == '/api/upcoming-events':
             manifest_path = os.path.join(UPCOMING_DIR, 'manifest.json')
