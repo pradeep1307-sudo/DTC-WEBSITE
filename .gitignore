@@ -5,6 +5,8 @@ __pycache__/
 Microsoft/
 .vscode/
 .tmp-menu-audit/
+.tmp-edge-events/
+DTCApp/
 
 # Local Microsoft Store installer; not a deployable website asset
 English Bible (WEB) Installer.exe
